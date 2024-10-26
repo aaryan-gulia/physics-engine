@@ -48,13 +48,17 @@ void System::addRigidBody2DCircle(double radius, double mass, Vector center, Vec
 
 void System::propogate(double d_t){
   if (this->circles.empty()) return;
+
   for(auto & circle: this->circles){
-    if(circle.center.x - circle.radius < 0) circle.velocity.x = 0; 
-    if(circle.center.x + circle.radius > this->dimensions.x) circle.velocity.x = 0; 
-    if(circle.center.y - circle.radius < 0) circle.velocity.y = 0; 
-    if(circle.center.y + circle.radius > this->dimensions.y) circle.velocity.y = 0; 
+
+    if(circle.center.x - circle.radius < 0 && circle.velocity.x < 0) circle.velocity.x = -circle.velocity.x; 
+    else if(circle.center.x + circle.radius > this->dimensions.x && circle.velocity.x > 0) circle.velocity.x = -circle.velocity.x; 
+    else if(circle.center.y - circle.radius < 0 && circle.velocity.y < 0) circle.velocity.y = -circle.velocity.y; 
+    else if(circle.center.y + circle.radius > this->dimensions.y && circle.velocity.y > 0) circle.velocity.y = -circle.velocity.y; 
+    else{
     circle.velocity = circle.velocity + std::accumulate(circle.forces.begin(), circle.forces.end(), Vector(0.0,0.0))
                                       / circle.mass * d_t;
+    }
     circle.center = circle.center + circle.velocity * d_t;  
   }
 }
