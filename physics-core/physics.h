@@ -9,11 +9,12 @@ class Vector{
 
   public:
     Vector(double x, double y):x(x),y(y){};
-    Vector(Vector & vec):x(vec.x),y(vec.y){};
     Vector operator+(Vector vec);
     Vector operator-(Vector vec);
     Vector operator*(double scalar);
     Vector operator/(double scalar);    
+    double distance(Vector vec1);
+    double length();
 };
 
 class RigidBody2DCircle{
