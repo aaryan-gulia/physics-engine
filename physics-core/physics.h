@@ -16,18 +16,20 @@ class Vector{
     Vector operator/(double scalar);    
     double distance(Vector vec1);
     double length();
+    Vector unit();
 };
 
 class RigidBody2DCircle{
   public: 
     const double radius, mass;
     Vector center;
+    Vector center_prev;
     Vector velocity;
     std::vector<Vector> forces;
 
   public:
     RigidBody2DCircle(double radius, double mass, Vector center, Vector velocity, Vector gravity);
-    void collide(RigidBody2DCircle circle);
+    void collide(RigidBody2DCircle &circle);
 };
 
 class System{
@@ -40,6 +42,7 @@ class System{
     System(Vector dimensions, Vector gAcceleration):dimensions(dimensions),gAcceleration(gAcceleration){};
     void addRigidBody2DCircle(double radius, double mass, Vector center, Vector velocity);
     void propogate(double d_t);
+    void constraints(RigidBody2DCircle &circle);
 };
 
 }
