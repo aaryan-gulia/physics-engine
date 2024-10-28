@@ -1,4 +1,3 @@
-#include "Vector.h"
 #include "Particle.h"
 #include <cstdint>
 #include <vector>

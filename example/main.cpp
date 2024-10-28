@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include<iostream>
 #include <random>
+#include <sstream>
+#include <string>
 #include <sys/fcntl.h>
 #include"raylib.h"
 
@@ -18,9 +20,9 @@ int main(){
     BeginDrawing();
 
     auto frame_time = GetFrameTime();    
-    ClearBackground(WHITE);
+    ClearBackground(LIGHTGRAY);
     DrawCircle(system.getCenter()[0],system.getCenter()[1] ,system.getRadius(), BLACK );
-
+    DrawFPS(10, 10);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
       system.addObject(Vector3D{GetMousePosition().x,GetMousePosition().y,0.0f},10.0f);
       }
