@@ -1,16 +1,16 @@
 #include"Vector.h"
 
 struct Particle{
-  Vector3D position;
-  Vector3D position_old;
-  Vector3D velocity;
-  Vector3D force;
+  physics_type::Vector2 position;
+  physics_type::Vector2 position_old;
+  physics_type::Vector2 velocity;
+  physics_type::Vector2 force{0.0f,10.0f};
   const float radius;
   const float mass;
 
   public:
-    Particle(Vector3D position, float radius);
+    Particle(physics_type::Vector2 position, float radius);
     Particle();
     void varlet(float dt);
-    void addForce(Vector3D force);
+    void addForce(physics_type::Vector2 force);
 };

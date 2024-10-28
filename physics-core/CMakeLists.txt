@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(${PROJECT_NAME} System.cpp Particle.cpp)
+add_library(${PROJECT_NAME} System.cpp Particle.cpp Vector.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC .)

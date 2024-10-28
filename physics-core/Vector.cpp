@@ -3,11 +3,19 @@
 
 using namespace physics_type;
 
-Vector2 Vector2::operator+(Vector2 vec){
+Vector2 const Vector2::operator+(Vector2 vec){
   return Vector2(this->x + vec.x, this->y + vec.y);
 }
 Vector2 Vector2::operator-(Vector2 vec){
   return Vector2(this->x - vec.x, this->y - vec.y);
+}
+void Vector2::operator+=(Vector2 vec){
+  this->x += vec.x;
+  this->y += vec.y;
+}
+void Vector2::operator-=(Vector2 vec){
+  this->x -= vec.x;
+  this->y -= vec.y;
 }
 bool const Vector2::operator==(const Vector2 vec){
   return this->x == vec.x && this->y == vec.y;

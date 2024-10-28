@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdint>
 
-void System::update(float frame_time){
+void System::update(float _frame_time=0.0f){
   accumulateForces();
   varlet();
   for(uint32_t i{0}; i < this->sub_steps; ++i){
@@ -19,20 +19,11 @@ void System::varlet(){
 
 void System::satisfyConstraints(){
   for(auto& particle: objects){
-    Vector3D center_to_object = {
-      particle.position[0] - this->center[0],
-      particle.position[1] - this->center[1],
-      particle.position[2] - this->center[2]
-    };
-
-    float dist = std::sqrt((center_to_object[0] * center_to_object[0] +
-      center_to_object[1] * center_to_object[1] +
-      center_to_object[2] * center_to_object[2]));
+    physics_type::Vector2 center_to_object = particle.position - this->center;
+    float dist = center_to_object.length();
     
     if(dist + particle.radius > this->radius){
-      particle.position[0] = this->center[0] + center_to_object[0]/dist * (this->radius - particle.radius);
-      particle.position[1] = this->center[1] + center_to_object[1]/dist * (this->radius - particle.radius);
-      particle.position[2] = this->center[2] + center_to_object[2]/dist * (this->radius - particle.radius);
+      particle.position = this->center + center_to_object.unit() *(this->radius - particle.radius);
     }
   }
 
@@ -43,25 +34,16 @@ void System::satisfyConstraints(){
     for(uint32_t k{i+1}; k < object_count; k++){
       Particle& object2 = objects[k];
 
-      Vector3D collision_vector = {
-        object1.position[0] - object2.position[0],
-        object1.position[1] - object2.position[1],
-        object1.position[2] - object2.position[2]
-      };
-      float dist = std::sqrt((collision_vector[0] * collision_vector[0] +
-        collision_vector[1] * collision_vector[1]));
+      physics_type::Vector2 collision_vector = object1.position - object2.position;
+      float dist = collision_vector.length();
+      
       if(dist < object1.radius + object2.radius){
         float mass_ratio_1 = object1.mass/(object1.mass+object2.mass);
         float mass_ratio_2 = object2.mass/(object1.mass+object2.mass);
         float delta = (dist - object1.radius - object2.radius) *1.0f;
 
-        object1.position[0] -= collision_vector[0]/dist * delta;
-        object1.position[1] -= collision_vector[1]/dist * delta;
-        object1.position[2] -= collision_vector[2]/dist * delta;
-
-        object2.position[0] += collision_vector[0]/dist * delta;
-        object2.position[1] += collision_vector[1]/dist * delta;
-        object2.position[2] += collision_vector[2]/dist * delta;
+        object1.position -= collision_vector.unit() * delta;
+        object2.position += collision_vector.unit() * delta;
       }
     }
   }
@@ -71,7 +53,7 @@ const std::vector<Particle>& System::getObjects(){
   return this->objects;
 }
 
-void System::addObject(Vector3D position, float radius){
+void System::addObject(physics_type::Vector2 position, float radius){
   objects.emplace_back(Particle(position, radius));
 }
 void System::addObject(){
@@ -80,11 +62,7 @@ void System::addObject(){
 
 void System::accumulateForces(){
   for(auto& particle: objects){
-    
-    particle.force[0] = this->gravity[0]; 
-    particle.force[1] = this->gravity[1]; 
-    particle.force[2] = this->gravity[2];
-     
+    particle.force = this->gravity;    
   }
 }
 
@@ -92,7 +70,7 @@ float System::getRadius(){
   return this->radius;
 }
 
-std::vector<float> System::getCenter(){
-  return std::vector<float>({center[0],center[1],center[2]});
+physics_type::Vector2 System::getCenter(){
+  return this->center;
 }
 

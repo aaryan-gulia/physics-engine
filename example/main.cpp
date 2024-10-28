@@ -13,7 +13,7 @@ int main(){
   const int screen_height = 450;
 
   System system = System();
-  system.addObject(Vector3D{300.0f,100.0f,0.0f},10.0f);
+  system.addObject(physics_type::Vector2{300.0f,100.0f},10.0f);
   InitWindow(screen_width,screen_height ,"Particle Simulation Using Physics Engine" );
 
   while(!WindowShouldClose()){
@@ -21,13 +21,13 @@ int main(){
 
     auto frame_time = GetFrameTime();    
     ClearBackground(LIGHTGRAY);
-    DrawCircle(system.getCenter()[0],system.getCenter()[1] ,system.getRadius(), BLACK );
+    DrawCircle(system.getCenter().x,system.getCenter().y ,system.getRadius(), BLACK );
     DrawFPS(10, 10);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-      system.addObject(Vector3D{GetMousePosition().x,GetMousePosition().y,0.0f},10.0f);
+      system.addObject(physics_type::Vector2{GetMousePosition().x,GetMousePosition().y},10.0f);
       }
     for (Particle circle: system.getObjects()){
-      DrawCircle(circle.position[0], circle.position[1], circle.radius, BLUE);
+      DrawCircle(circle.position.x, circle.position.y, circle.radius, BLUE);
     }
     
     system.update(frame_time);   

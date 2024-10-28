@@ -5,19 +5,19 @@
 
 class System{
   std::vector<Particle> objects;
-  const Vector3D gravity = {0.0f, 0.5f, 0.0f};
-  const Vector3D center = {400.0f, 225.0f,0.0f};
-  const float radius = 200.0f;
-  const uint32_t sub_steps = 10;
+  physics_type::Vector2 gravity = {0.0f, 0.5f};
+  physics_type::Vector2 center = {400.0f, 225.0f};
+  float radius = 200.0f;
+  uint32_t sub_steps = 10;
   float dt = 1.0f/10.0f;
 
   public:
     void update(float frame_time);
-    void addObject(Vector3D position, float radius);
+    void addObject(physics_type::Vector2 position, float radius);
     void addObject();
     const std::vector<Particle>& getObjects();
     float getRadius();
-    std::vector<float> getCenter();
+    physics_type::Vector2 getCenter();
     
   private:
     void varlet();
