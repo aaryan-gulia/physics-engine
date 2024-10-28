@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include<iostream>
 #include <random>
+#include <sys/fcntl.h>
 #include"raylib.h"
 
 int main(){
@@ -9,24 +10,25 @@ int main(){
   const int screen_width = 800;
   const int screen_height = 450;
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> distribute(-100,100);
-
   System system = System();
-  system.addObject(Vector3D{300.0f,100.0f,0.0f},20.0 );
+  system.addObject(Vector3D{300.0f,100.0f,0.0f},10.0f);
   InitWindow(screen_width,screen_height ,"Particle Simulation Using Physics Engine" );
-  
+
   while(!WindowShouldClose()){
     BeginDrawing();
-    
-    ClearBackground(WHITE);
 
+    auto frame_time = GetFrameTime();    
+    ClearBackground(WHITE);
+    DrawCircle(system.getCenter()[0],system.getCenter()[1] ,system.getRadius(), BLACK );
+
+    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+      system.addObject(Vector3D{GetMousePosition().x,GetMousePosition().y,0.0f},10.0f);
+      }
     for (Particle circle: system.getObjects()){
-      DrawCircle(circle.position[0], circle.position[1], circle.radius, BLACK);
+      DrawCircle(circle.position[0], circle.position[1], circle.radius, BLUE);
     }
     
-    system.update();   
+    system.update(frame_time);   
     
     EndDrawing();
   }

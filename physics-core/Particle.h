@@ -6,11 +6,12 @@ struct Particle{
   Vector3D position_old;
   Vector3D velocity;
   Vector3D force;
-  float radius;
-  float mass;
+  const float radius;
+  const float mass;
 
   public:
     Particle(Vector3D position, float radius);
+    Particle();
     void varlet(float dt);
     void addForce(Vector3D force);
 };
