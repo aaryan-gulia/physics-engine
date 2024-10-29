@@ -36,11 +36,11 @@ void System::satisfyConstraints(){
 
       physics_type::Vector2 collision_vector = object1.position - object2.position;
       float dist = collision_vector.length();
-      
+           
       if(dist < object1.radius + object2.radius){
         float mass_ratio_1 = object1.mass/(object1.mass+object2.mass);
         float mass_ratio_2 = object2.mass/(object1.mass+object2.mass);
-        float delta = (dist - object1.radius - object2.radius) *1.0f;
+        float delta = 0.5f * (dist - object1.radius - object2.radius) *0.75f;
 
         object1.position -= collision_vector.unit() * delta;
         object2.position += collision_vector.unit() * delta;

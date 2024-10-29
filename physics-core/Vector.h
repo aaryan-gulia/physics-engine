@@ -1,5 +1,4 @@
 
-typedef float Vector3D[3] ;
 
 
 namespace physics_type{

@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(physics-core)
 add_subdirectory(example)
+add_subdirectory(tests)
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink
