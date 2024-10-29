@@ -53,11 +53,9 @@ void GlobalConstraint::applyGlobalCollisionResolution(std::shared_ptr<Particle> 
       }
 }
 
-#include<iostream>
 void RelativeConstraint::apply(){
   float d_2 = getDistanceSquared(std::dynamic_pointer_cast<Particle>(entity1),
                                  std::dynamic_pointer_cast<Particle>(entity2));
-  std::cout<<d_2<<std::endl;
   if(d_2 > m_constrain_distance_max_squared){
     applyPull(std::dynamic_pointer_cast<Particle>(entity1),std::dynamic_pointer_cast<Particle>(entity2) );
   }
@@ -71,9 +69,8 @@ float RelativeConstraint::getDistanceSquared(std::shared_ptr<Particle>particle_e
 }
 
 void RelativeConstraint::applyPush(std::shared_ptr<Particle>particle_entity1, std::shared_ptr<Particle>particle_entity2){
-  std::cout<<"Applying Push"<<std::endl;
   float distance = particle_entity1->position.distance(particle_entity2->position);
-  float delta = (m_constrain_distance_max_squared - distance) * m_constraint_strength;
+  float delta = (m_constraint_distance_min - distance) * m_constraint_strength;
   auto unit_vec = particle_entity1->position - particle_entity2->position;
   
   particle_entity1->position += unit_vec * delta * mass_ratio_2;
@@ -81,9 +78,8 @@ void RelativeConstraint::applyPush(std::shared_ptr<Particle>particle_entity1, st
 }
 
 void RelativeConstraint::applyPull(std::shared_ptr<Particle>particle_entity1, std::shared_ptr<Particle>particle_entity2){
-  std::cout<<"Applying Pull"<<std::endl;
   float distance = particle_entity1->position.distance(particle_entity2->position);
-  float delta = (m_constrain_distance_max_squared - distance) * m_constraint_strength;
+  float delta = (distance - m_constraint_distance_max) * m_constraint_strength;
   auto unit_vec = particle_entity1->position - particle_entity2->position;
   
   particle_entity1->position -= unit_vec * delta * mass_ratio_2;
