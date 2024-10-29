@@ -32,7 +32,7 @@ float Vector2::distance(Vector2 vec){
 }
 float Vector2::distance_squared(Vector2 vec){
   Vector2 diff = *this - vec;
-  return diff.length();
+  return diff.length_squared();
 }
 float Vector2::length(){
   return std::sqrt(this->x * this->x + this->y * this->y);
