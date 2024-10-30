@@ -85,3 +85,20 @@ void RelativeConstraint::applyPull(std::shared_ptr<Particle>particle_entity1, st
   particle_entity1->position -= unit_vec * delta * mass_ratio_2;
   particle_entity2->position += unit_vec * delta * mass_ratio_1;
 }
+
+
+
+void FixedPositionConstraint::apply(){
+  if(m_entity->position.x < m_fixed_point_min.x){
+    m_entity->position.x = m_fixed_point_min.x;
+  }
+  if(m_entity->position.y < m_fixed_point_min.y){
+    m_entity->position.y = m_fixed_point_min.y;
+  }
+  if(m_entity->position.x > m_fixed_point_max.x){
+    m_entity->position.x = m_fixed_point_max.x;
+  }
+  if(m_entity->position.y > m_fixed_point_max.y){
+    m_entity->position.y = m_fixed_point_max.y;
+  }
+}

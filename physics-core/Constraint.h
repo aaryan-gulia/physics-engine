@@ -64,3 +64,24 @@ class RelativeConstraint : public Constraint{
     void applyPush(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle>particle_entity2);
     void applyPull(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle>particle_entity2);
 };
+
+class FixedPositionConstraint : Constraint {
+  std::shared_ptr<Entity> m_entity;
+  physics_type::Vector2 m_fixed_point_min;
+  physics_type::Vector2 m_fixed_point_max;
+  float m_constraint_strength;
+  bool m_breakable;
+  float m_constraint_breakpoint;
+
+  public:
+    FixedPositionConstraint(std::shared_ptr<Entity> entity, physics_type::Vector2 fixed_point_min, 
+                            physics_type::Vector2 fixed_point_max, float constraint_strength = 1.0f, 
+                            bool breakable = false, float constraint_breakpoint = false): m_entity(entity),
+                            m_fixed_point_min(fixed_point_min), m_fixed_point_max(fixed_point_max), 
+                            m_constraint_strength(constraint_strength), m_breakable(breakable), 
+                            m_constraint_breakpoint(constraint_breakpoint){}
+    virtual void apply() override;
+
+    
+};
+
