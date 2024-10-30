@@ -13,6 +13,7 @@ void PhysicsWorld::update(float _frame_time=0.0f){
 void PhysicsWorld::varlet(){
   for(auto& particle: entities){
     particle->varlet(this->dt);
+    particle->force = {0.0f,0.0f};
   }
 }
 
@@ -35,15 +36,8 @@ void PhysicsWorld::addConstraint(std::shared_ptr<Constraint> constraint){
 
 void PhysicsWorld::accumulateForces(){
   for(auto& particle: entities){
-    particle->force = this->gravity;    
+    particle->force += this->gravity;    
   }
 }
 
-float PhysicsWorld::getRadius(){
-  return this->radius;
-}
-
-physics_type::Vector2 PhysicsWorld::getCenter(){
-  return this->center;
-}
 

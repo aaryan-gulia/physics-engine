@@ -3,19 +3,26 @@
 #include <sys/fcntl.h>
 #include"raylib.h"
 #include<iostream>
+
+extern const float PARTICLE_RADIUS;
+extern const float WINDOW_HEIGHT;
+extern const float WINDOW_WIDTH;
+
+PhysicsWorld setup();
+std::shared_ptr<Particle> addParticle(float x, float y, PhysicsWorld & world);
+std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_begin, float x_end, float y_end, 
+                                                        PhysicsWorld & world);
+
+
 int main(){
 
-  const int screen_width = 800;
-  const int screen_height = 450;
-
-  PhysicsWorld system = PhysicsWorld();
-  Particle particle(10.0f, 1.0f, {200.0f,200.0f});
-  GlobalConstraint globalConstraint(system.getEntities(),{800.0f, 450.0f});
-  system.addEntity(std::make_shared<Particle>(particle));
-  system.addConstraint(std::make_shared<GlobalConstraint>(globalConstraint));
+  PhysicsWorld world = setup();
+  addParticle(200.0f, 200.0f, world);
   
-  InitWindow(screen_width,screen_height ,"Particle Simulation Using Physics Engine" );
+  InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT ,"Particle Simulation Using Physics Engine" );
 
+  physics_type::Vector2 starting_pos, ending_pos;
+  
   while(!WindowShouldClose()){
     BeginDrawing();
 
@@ -23,28 +30,20 @@ int main(){
     ClearBackground(LIGHTGRAY);
     DrawFPS(10, 10);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        Particle particle1(10.0f, 1.0f, {GetMousePosition().x,GetMousePosition().y});
-        Particle particle2(10.0f, 1.0f, {GetMousePosition().x+20.0f,GetMousePosition().y});
-        auto ptr1 = std::make_shared<Particle>(particle1);
-        auto ptr2 = std::make_shared<Particle>(particle2);
-        // Particle particle3(10.0f, 1.0f, {GetMousePosition().x+40.0f,GetMousePosition().y});
-        // Particle particle4(10.0f, 1.0f, {GetMousePosition().x+60.0f,GetMousePosition().y});
-        // Particle particle5(10.0f, 1.0f, {GetMousePosition().x+80.0f,GetMousePosition().y});
-        // Particle particle6(10.0f, 1.0f, {GetMousePosition().x+100.0f,GetMousePosition().y});
-        // Particle particle7(10.0f, 1.0f, {GetMousePosition().x+120.0f,GetMousePosition().y});
-        // Particle particle8(10.0f, 1.0f, {GetMousePosition().x+140.0f,GetMousePosition().y});
-        RelativeConstraint rl(ptr1,ptr2,0.0f,20.0f);
-        system.addEntity(ptr1);
-        system.addEntity(ptr2);
-        system.addConstraint(std::make_shared<RelativeConstraint>(rl));
-      }
+      starting_pos = {GetMousePosition().x, GetMousePosition().y};
+    }
+    if(IsMouseButtonReleased(MOUSE_LEFT_BUTTON)){
+      ending_pos = {GetMousePosition().x, GetMousePosition().y};
+      addParticleChain(starting_pos.x,starting_pos.y ,ending_pos.x ,ending_pos.y ,world );
+      std::cout<<"PARTICLE CHAIN ADDED"<<std::endl;
+    }
 
-    for (auto entity: system.getEntities()){
+    for (auto entity: world.getEntities()){
       auto circle = std::dynamic_pointer_cast<Particle>(entity);
       DrawCircle(circle->position.x, circle->position.y, circle->radius, BLUE);
     }
 
-    system.update(frame_time);   
+    world.update(frame_time);   
     
     EndDrawing();
   }

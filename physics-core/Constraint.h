@@ -65,7 +65,7 @@ class RelativeConstraint : public Constraint{
     void applyPull(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle>particle_entity2);
 };
 
-class FixedPositionConstraint : Constraint {
+class FixedPositionConstraint : public Constraint {
   std::shared_ptr<Entity> m_entity;
   physics_type::Vector2 m_fixed_point_min;
   physics_type::Vector2 m_fixed_point_max;

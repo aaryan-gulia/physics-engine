@@ -73,17 +73,17 @@ void RelativeConstraint::applyPush(std::shared_ptr<Particle>particle_entity1, st
   float delta = (m_constraint_distance_min - distance) * m_constraint_strength;
   auto unit_vec = particle_entity1->position - particle_entity2->position;
   
-  particle_entity1->position += unit_vec * delta * mass_ratio_2;
-  particle_entity2->position -= unit_vec * delta * mass_ratio_1;
+  particle_entity1->force += unit_vec * delta;
+  particle_entity2->force -= unit_vec * delta;
 }
 
 void RelativeConstraint::applyPull(std::shared_ptr<Particle>particle_entity1, std::shared_ptr<Particle>particle_entity2){
   float distance = particle_entity1->position.distance(particle_entity2->position);
   float delta = (distance - m_constraint_distance_max) * m_constraint_strength;
   auto unit_vec = particle_entity1->position - particle_entity2->position;
-  
-  particle_entity1->position -= unit_vec * delta * mass_ratio_2;
-  particle_entity2->position += unit_vec * delta * mass_ratio_1;
+
+  particle_entity1->force -= unit_vec * delta;
+  particle_entity2->force += unit_vec * delta;
 }
 
 
