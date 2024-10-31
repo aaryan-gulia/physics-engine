@@ -1,9 +1,10 @@
 #include"PhysicsWorld.h"
+#include "raylib.h"
 #include <cstdint>
 #include <memory>
 
 
-extern const float PARTICLE_RADIUS = 20.0f;
+extern const float PARTICLE_RADIUS = 10.0f;
 extern const float WINDOW_HEIGHT = 450.0f;
 extern const float WINDOW_WIDTH = 800.0f;
  
@@ -37,29 +38,41 @@ std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_b
   
   for(uint32_t i = 1; i < num_particles; i++){
     auto particle = std::make_shared<Particle>(Particle(PARTICLE_RADIUS,1.0f, 
-                                                               {x_begin + PARTICLE_RADIUS*2.0f*i,
-                                                             y_begin}));
+                                                               {x_begin + (x_end - x_begin) * i / num_particles,
+                                                             y_begin + (y_end - y_begin) * i / num_particles}));
     world.addEntity(particle);
     particles.push_back(particle);
   } 
   
   num_particles = particles.size();
   if(num_particles >= 2){
-    world.addConstraint(std::make_shared<FixedPositionConstraint>(
-                          FixedPositionConstraint(particles.front(),particles.front()->position,particles.front()->position)
-                        ));
-    world.addConstraint(std::make_shared<FixedPositionConstraint>(
-                          FixedPositionConstraint(particles.back(),
-                                                  particles.back()->position,
-                                                  particles.back()->position)
-                        ));
+    // world.addConstraint(std::make_shared<FixedPositionConstraint>(
+    //                       FixedPositionConstraint(particles.front(),particles.front()->position,particles.front()->position)));
+    // world.addConstraint(std::make_shared<FixedPositionConstraint>(
+    //                       FixedPositionConstraint(particles.back(),
+    //                                               particles.back()->position,
+    //                                               particles.back()->position)));
     for(uint32_t i = 0; i < particles.size()-1; i++){
       world.addConstraint(std::make_shared<RelativeConstraint>(
-                            RelativeConstraint(particles[i],particles[i+1],0.0f,PARTICLE_RADIUS*2.0f,0.1f)
-                          ));
+                            RelativeConstraint(particles[i],particles[i+1],0.0f,PARTICLE_RADIUS*1.99f,0.2f)));
     }
   }
   return particles;
+}
+
+void addRigidBody(float x, float y, PhysicsWorld& world){
+  auto chain1 = addParticleChain(x, y, x+PARTICLE_RADIUS*10,y ,world );
+  auto chain2 = addParticleChain(x,y+2*PARTICLE_RADIUS ,x+PARTICLE_RADIUS*10 ,y+2*PARTICLE_RADIUS , world);
+  auto chain3 = addParticleChain(x,y+4*PARTICLE_RADIUS ,x+PARTICLE_RADIUS*10 ,y+4*PARTICLE_RADIUS , world);
+
+  for(uint32_t i = 0; i< chain1.size(); i++){
+    world.addConstraint(
+      std::make_shared<RelativeConstraint>(RelativeConstraint(chain1[i],chain2[i],0.0f,PARTICLE_RADIUS*1.99f,0.2f))
+    );
+    world.addConstraint(
+      std::make_shared<RelativeConstraint>(RelativeConstraint(chain2[i],chain3[i],0.0f,PARTICLE_RADIUS*1.99f,0.2f))
+    );
+  }
 }
 
 

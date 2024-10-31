@@ -1,6 +1,9 @@
 #include"Particle.h"
+#include <utility>
 #include <vector>
 #include <memory>
+#include"BroadPhaseGrid.h"
+#include "Vector.h"
 
 class Constraint{
   public: 
@@ -8,54 +11,55 @@ class Constraint{
     virtual ~Constraint() = default;
 };
 
-
-
-class GlobalConstraint : public Constraint{
+class GlobalCollisionConstraint : public Constraint{
   std::vector<std::shared_ptr<Entity>> & m_entities;
+  std::vector<std::pair<physics_type::Vector2,physics_type::Vector2>> m_aabb_vec;
   physics_type::Vector2 m_global_boundary;
+  BroadPhaseGrid m_collision_grid;
 
   public:
-    GlobalConstraint(std::vector<std::shared_ptr<Entity>>& entities, 
+    GlobalCollisionConstraint(std::vector<std::shared_ptr<Entity>>& entities, 
                      physics_type::Vector2 global_boundary): m_entities(entities), m_global_boundary(global_boundary){}
     virtual void apply() override;
 
   private:
     void applyGlobalBoundary(std::shared_ptr<Particle> particle_entity);
     void applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle> particle_entity2);
-    
+    std::vector<uint32_t> getBoundaryEntities();
+    std::vector<uint32_t> getCollisitionEntities();
 };
 
 
 class RelativeConstraint : public Constraint{
-  std::shared_ptr<Entity> entity1;
-  std::shared_ptr<Entity> entity2;
+  std::shared_ptr<Entity> m_entity1;
+  std::shared_ptr<Entity> m_entity2;
   float m_constraint_distance_min;
   float m_constraint_distance_max;
-  float m_constrain_distance_min_squared;
-  float m_constrain_distance_max_squared;
+  float m_constraint_distance_min_squared;
+  float m_constraint_distance_max_squared;
   float m_constraint_strength;
   bool m_breakable;
   float m_constraint_breakpoint;
-  float mass_ratio_1;
-  float mass_ratio_2;
+  float m_mass_ratio_1;
+  float m_mass_ratio_2;
   
   public:
     RelativeConstraint(std::shared_ptr<Entity> entity1, std::shared_ptr<Entity>entity2,
                       float constraint_distance_min, float constraint_distance_max, 
                       float constraint_strength = 1.0f, bool breakable = false, 
-                      float constraint_breakpoint = 0.0f): entity1(entity1), entity2(entity2), 
+                      float constraint_breakpoint = 0.0f): m_entity1(entity1), m_entity2(entity2), 
                                                           m_constraint_distance_min(constraint_distance_min),
                                                           m_constraint_distance_max(constraint_distance_max),
                                                           m_constraint_strength(constraint_strength),
                                                           m_breakable(breakable),
                                                           m_constraint_breakpoint(constraint_breakpoint),
-                                                          m_constrain_distance_min_squared(
+                                                          m_constraint_distance_min_squared(
                                                           constraint_distance_min * constraint_distance_min),
-                                                          m_constrain_distance_max_squared(
+                                                          m_constraint_distance_max_squared(
                                                           constraint_distance_max * constraint_distance_max),
-                                                          mass_ratio_1(
+                                                          m_mass_ratio_1(
                                                           entity1->mass / (entity1->mass + entity2->mass)),
-                                                          mass_ratio_2(
+                                                          m_mass_ratio_2(
                                                           entity2->mass / (entity1->mass + entity2->mass)){}
     virtual void apply() override;
 

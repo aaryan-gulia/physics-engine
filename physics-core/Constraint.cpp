@@ -1,8 +1,9 @@
 #include"Constraint.h"
 #include <memory>
 
-void GlobalConstraint::apply(){
+void GlobalCollisionConstraint::apply(){
   
+
   for(auto entity: m_entities){
     applyGlobalBoundary(std::dynamic_pointer_cast<Particle>(entity));
   }
@@ -19,7 +20,7 @@ void GlobalConstraint::apply(){
   }
 }
 
-void GlobalConstraint::applyGlobalBoundary(std::shared_ptr<Particle> particle_entity){
+void GlobalCollisionConstraint::applyGlobalBoundary(std::shared_ptr<Particle> particle_entity){
   if(particle_entity->position.x - particle_entity->radius < 0){
     particle_entity->position.x = particle_entity->radius;
   }
@@ -36,7 +37,7 @@ void GlobalConstraint::applyGlobalBoundary(std::shared_ptr<Particle> particle_en
   }
 }
 
-void GlobalConstraint::applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1,
+void GlobalCollisionConstraint::applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1,
                                                       std::shared_ptr<Particle> particle_entity2){
   
       physics_type::Vector2 collision_vector = particle_entity1->position - particle_entity2->position;
@@ -54,13 +55,13 @@ void GlobalConstraint::applyGlobalCollisionResolution(std::shared_ptr<Particle> 
 }
 
 void RelativeConstraint::apply(){
-  float d_2 = getDistanceSquared(std::dynamic_pointer_cast<Particle>(entity1),
-                                 std::dynamic_pointer_cast<Particle>(entity2));
-  if(d_2 > m_constrain_distance_max_squared){
-    applyPull(std::dynamic_pointer_cast<Particle>(entity1),std::dynamic_pointer_cast<Particle>(entity2) );
+  float d_2 = getDistanceSquared(std::dynamic_pointer_cast<Particle>(m_entity1),
+                                 std::dynamic_pointer_cast<Particle>(m_entity2));
+  if(d_2 > m_constraint_distance_max_squared){
+    applyPull(std::dynamic_pointer_cast<Particle>(m_entity1),std::dynamic_pointer_cast<Particle>(m_entity2) );
   }
-  else if(d_2 < m_constrain_distance_min_squared){
-    applyPush(std::dynamic_pointer_cast<Particle>(entity1),std::dynamic_pointer_cast<Particle>(entity2) );
+  else if(d_2 < m_constraint_distance_min_squared){
+    applyPush(std::dynamic_pointer_cast<Particle>(m_entity1),std::dynamic_pointer_cast<Particle>(m_entity2) );
     }
 }
 

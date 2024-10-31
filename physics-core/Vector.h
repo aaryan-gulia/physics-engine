@@ -1,5 +1,6 @@
 
-
+#ifndef VECTOR2_H
+#define VECTOR2_H
 
 namespace physics_type{
   
@@ -25,3 +26,5 @@ class Vector2{
 };
 
 }  
+
+#endif //VECTOR2_H
