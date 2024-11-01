@@ -1,4 +1,5 @@
 #include"Particle.h"
+#include <cstdint>
 #include <utility>
 #include <vector>
 #include <memory>
@@ -12,25 +13,27 @@ class Constraint{
 };
 
 class GlobalCollisionConstraint : public Constraint{
+  EntityStore& m_es;
   std::vector<std::shared_ptr<Entity>> & m_entities;
   std::vector<std::pair<physics_type::Vector2,physics_type::Vector2>> m_aabb_vec;
-  physics_type::Vector2 m_global_boundary;
+  Eigen::Vector2f m_global_boundary;
   BroadPhaseGrid m_collision_grid;
 
   public:
-    GlobalCollisionConstraint(std::vector<std::shared_ptr<Entity>>& entities, 
-                     physics_type::Vector2 global_boundary): m_entities(entities), m_global_boundary(global_boundary){}
+    GlobalCollisionConstraint(std::vector<std::shared_ptr<Entity>>& entities, EntityStore& es, 
+                     float global_boundary[2]): m_entities(entities), m_es(es), m_global_boundary(global_boundary){}
     virtual void apply() override;
 
   private:
-    void applyGlobalBoundary(std::shared_ptr<Particle> particle_entity);
+    void applyGlobalBoundary(uint32_t entity_index);
     void applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle> particle_entity2);
-    std::vector<uint32_t> getBoundaryEntities();
-    std::vector<uint32_t> getCollisitionEntities();
+    void updateAABBVec();
 };
 
 
 class RelativeConstraint : public Constraint{
+  uint32_t m_entity1_id;
+  uint32_t m_entity2_id;
   std::shared_ptr<Entity> m_entity1;
   std::shared_ptr<Entity> m_entity2;
   float m_constraint_distance_min;
@@ -70,6 +73,7 @@ class RelativeConstraint : public Constraint{
 };
 
 class FixedPositionConstraint : public Constraint {
+  uint32_t m_entity_id;
   std::shared_ptr<Entity> m_entity;
   physics_type::Vector2 m_fixed_point_min;
   physics_type::Vector2 m_fixed_point_max;

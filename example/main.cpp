@@ -44,9 +44,9 @@ int main(){
       addRigidBody(GetMousePosition().x,GetMousePosition().y ,world );
     }
 
-    for (auto entity: world.getEntities()){
-      auto circle = std::dynamic_pointer_cast<Particle>(entity);
-      DrawCircle(circle->position.x, circle->position.y, circle->radius, BLUE);
+    auto es = world.getEs();
+    for (uint32_t i =0; i < es.positions.size(); i++){
+      DrawCircle(es.positions[i][0], es.positions[i][1], es.ps.radius[i], BLUE);
     }
 
     world.update(frame_time);   

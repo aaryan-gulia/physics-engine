@@ -1,4 +1,6 @@
 #include"Entity.h"
+#include "Vector.h"
+#include <utility>
 
 struct Particle:Entity{
   const float radius;
@@ -13,5 +15,9 @@ struct Particle:Entity{
         position,
         velocity,
         restitution,
-        followGlobalBoundaryConstraint), radius(radius){};
+        followGlobalBoundaryConstraint), radius(radius){
+    physics_type::Vector2 aabb_min = position - physics_type::Vector2{radius,radius};
+    physics_type::Vector2 aabb_max = position + physics_type::Vector2{radius, radius};
+    aabb = std::make_pair(aabb_min, aabb_max);
+  };
 };

@@ -1,39 +1,46 @@
 #include"Constraint.h"
+#include "Eigen/src/Core/Matrix.h"
 #include <memory>
 
 void GlobalCollisionConstraint::apply(){
-  
+  m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
+  auto boundaryEntities = m_collision_grid.getBoundaryIndices();
+  //auto collisionEntities = m_collision_grid.getCollisionIndices();
 
-  for(auto entity: m_entities){
-    applyGlobalBoundary(std::dynamic_pointer_cast<Particle>(entity));
+  for(auto entity: boundaryEntities){
+    applyGlobalBoundary(entity);
   }
 
-  const uint32_t object_count = m_entities.size();
-  for(uint32_t i{0}; i < object_count; ++i){
-    auto entity1 = this->m_entities[i];
-    
-    for(uint32_t k{i+1}; k < object_count; k++){
-      auto entity2 = this->m_entities[k];
-      applyGlobalCollisionResolution(std::dynamic_pointer_cast<Particle>(entity1),
-                                     std::dynamic_pointer_cast<Particle>(entity2));
-    }
-  }
+  // for(auto grid_cell: m_collision_grid.m_dense_grid){
+  //   auto collisionEntities = grid_cell.second;
+  //   for(uint32_t i = 0; i < collisionEntities.size(); i++){
+  //     for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
+  //       applyGlobalCollisionResolution(std::dynamic_pointer_cast<Particle>(m_entities[collisionEntities[i]]),
+  //                                      std::dynamic_pointer_cast<Particle>(m_entities[collisionEntities[j]]));
+  //     }
+  //   }
+  // }
+
+  //for(auto entity_pair: collisionEntities){
+  //  applyGlobalCollisionResolution(std::dynamic_pointer_cast<Particle>(m_entities[entity_pair.first]),
+  //                                 std::dynamic_pointer_cast<Particle>(m_entities[entity_pair.second]));
+  //}
+
 }
 
-void GlobalCollisionConstraint::applyGlobalBoundary(std::shared_ptr<Particle> particle_entity){
-  if(particle_entity->position.x - particle_entity->radius < 0){
-    particle_entity->position.x = particle_entity->radius;
+
+void GlobalCollisionConstraint::applyGlobalBoundary(uint32_t entity_index){
+  if(m_es.aabb_min.at(entity_index)[0] < 0 ){
+    m_es.moveEntity_NonVarlet(entity_index, Eigen::Vector2f{-1*m_es.aabb_min.at(entity_index)[0], 0.0f});
   }
-  else if(particle_entity->position.x + particle_entity->radius > this->m_global_boundary.x){
-    particle_entity->position.x = this->m_global_boundary.x - particle_entity->radius;
-    
+  if(m_es.aabb_min.at(entity_index)[1] < 0 ){
+    m_es.moveEntity_NonVarlet(entity_index, Eigen::Vector2f{0.0f,-1*m_es.aabb_min.at(entity_index)[1]});
   }
-  
-  if(particle_entity->position.y - particle_entity->radius < 0){
-    particle_entity->position.y = particle_entity->radius;
+  if(m_es.aabb_max.at(entity_index)[0] > m_global_boundary[0]){
+    m_es.moveEntity_NonVarlet(entity_index,Eigen::Vector2f{m_global_boundary[0]-m_es.aabb_max.at(entity_index)[0],0.0f});
   }
-  else if(particle_entity->position.y + particle_entity->radius > this->m_global_boundary.y){
-    particle_entity->position.y = this->m_global_boundary.y - particle_entity->radius;
+  if(m_es.aabb_max.at(entity_index)[1] > m_global_boundary[1]){
+    m_es.moveEntity_NonVarlet(entity_index,Eigen::Vector2f{0.0f,m_global_boundary[1]-m_es.aabb_max.at(entity_index)[1]});
   }
 }
 
@@ -49,8 +56,8 @@ void GlobalCollisionConstraint::applyGlobalCollisionResolution(std::shared_ptr<P
         float mass_ratio_2 = particle_entity2->mass/(particle_entity1->mass+particle_entity2->mass);
         float delta = (dist - particle_entity1->radius - particle_entity2->radius) * 0.75;
 
-        particle_entity1->position -= collision_vector.unit() * delta * mass_ratio_2 * (collisition_restitiution + 1.0f);
-        particle_entity2->position += collision_vector.unit() * delta * mass_ratio_1 * (collisition_restitiution + 1.0f);
+        particle_entity1->position -= collision_vector / dist * delta * mass_ratio_2 * (collisition_restitiution + 1.0f);
+        particle_entity2->position += collision_vector / dist * delta * mass_ratio_1 * (collisition_restitiution + 1.0f);
       }
 }
 
