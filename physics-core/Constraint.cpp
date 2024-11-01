@@ -11,20 +11,14 @@ void GlobalCollisionConstraint::apply(){
     applyGlobalBoundary(entity);
   }
 
-  // for(auto grid_cell: m_collision_grid.m_dense_grid){
-  //   auto collisionEntities = grid_cell.second;
-  //   for(uint32_t i = 0; i < collisionEntities.size(); i++){
-  //     for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
-  //       applyGlobalCollisionResolution(std::dynamic_pointer_cast<Particle>(m_entities[collisionEntities[i]]),
-  //                                      std::dynamic_pointer_cast<Particle>(m_entities[collisionEntities[j]]));
-  //     }
-  //   }
-  // }
-
-  //for(auto entity_pair: collisionEntities){
-  //  applyGlobalCollisionResolution(std::dynamic_pointer_cast<Particle>(m_entities[entity_pair.first]),
-  //                                 std::dynamic_pointer_cast<Particle>(m_entities[entity_pair.second]));
-  //}
+  for(auto grid_cell: m_collision_grid.m_dense_grid){
+    auto collisionEntities = grid_cell.second;
+    for(uint32_t i = 0; i < collisionEntities.size(); i++){
+      for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
+        applyGlobalCollisionResolution(collisionEntities[i],collisionEntities[j]);
+      }
+    }
+  }
 
 }
 
@@ -44,20 +38,19 @@ void GlobalCollisionConstraint::applyGlobalBoundary(uint32_t entity_index){
   }
 }
 
-void GlobalCollisionConstraint::applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1,
-                                                      std::shared_ptr<Particle> particle_entity2){
+void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uint32_t id2){
   
-      physics_type::Vector2 collision_vector = particle_entity1->position - particle_entity2->position;
-      float dist = collision_vector.length();
+      auto collision_vector = m_es.positions[id1] - m_es.positions[id2];
+      float dist = collision_vector.norm();
            
-      if(dist < particle_entity1->radius + particle_entity2->radius){
-        float collisition_restitiution = (particle_entity1->restitution + particle_entity2->restitution)/2.0f;
-        float mass_ratio_1 = particle_entity1->mass/(particle_entity1->mass+particle_entity2->mass);
-        float mass_ratio_2 = particle_entity2->mass/(particle_entity1->mass+particle_entity2->mass);
-        float delta = (dist - particle_entity1->radius - particle_entity2->radius) * 0.75;
+      if(dist < m_es.ps.radius[id1] + m_es.ps.radius[id2]){
+        float collisition_restitiution = (m_es.restitutions[id1] + m_es.restitutions[id2])/2.0f;
+        float mass_ratio_1 = m_es.masses[id1]/(m_es.masses[id1]+m_es.masses[id2]);
+        float mass_ratio_2 = m_es.masses[id2]/(m_es.masses[id1]+m_es.masses[id2]);
+        float delta = (dist - m_es.ps.radius[id1] - m_es.ps.radius[id2]) * 0.75;
 
-        particle_entity1->position -= collision_vector / dist * delta * mass_ratio_2 * (collisition_restitiution + 1.0f);
-        particle_entity2->position += collision_vector / dist * delta * mass_ratio_1 * (collisition_restitiution + 1.0f);
+        m_es.positions[id1] -= collision_vector / dist * delta * mass_ratio_2 * (collisition_restitiution + 1.0f);
+        m_es.positions[id2] += collision_vector / dist * delta * mass_ratio_1 * (collisition_restitiution + 1.0f);
       }
 }
 

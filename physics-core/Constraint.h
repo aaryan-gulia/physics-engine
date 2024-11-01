@@ -26,7 +26,7 @@ class GlobalCollisionConstraint : public Constraint{
 
   private:
     void applyGlobalBoundary(uint32_t entity_index);
-    void applyGlobalCollisionResolution(std::shared_ptr<Particle> particle_entity1, std::shared_ptr<Particle> particle_entity2);
+    void applyGlobalCollisionResolution(uint32_t id1, uint32_t id2);
     void updateAABBVec();
 };
 
