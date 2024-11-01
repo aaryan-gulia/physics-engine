@@ -1,5 +1,4 @@
 #include"Constraint.h"
-#include "Eigen/src/Core/Matrix.h"
 #include <memory>
 
 void GlobalCollisionConstraint::apply(){
@@ -24,33 +23,35 @@ void GlobalCollisionConstraint::apply(){
 
 
 void GlobalCollisionConstraint::applyGlobalBoundary(uint32_t entity_index){
-  if(m_es.aabb_min.at(entity_index)[0] < 0 ){
-    m_es.moveEntity_NonVarlet(entity_index, Eigen::Vector2f{-1*m_es.aabb_min.at(entity_index)[0], 0.0f});
+  if(m_es.aabb_min.at(entity_index).x < 0 ){
+    m_es.moveEntity_NonVarlet(entity_index, {-1*m_es.aabb_min.at(entity_index).x, 0.0f});
   }
-  if(m_es.aabb_min.at(entity_index)[1] < 0 ){
-    m_es.moveEntity_NonVarlet(entity_index, Eigen::Vector2f{0.0f,-1*m_es.aabb_min.at(entity_index)[1]});
+  if(m_es.aabb_min.at(entity_index).y < 0 ){
+    m_es.moveEntity_NonVarlet(entity_index, {0.0f,-1*m_es.aabb_min.at(entity_index).y});
   }
-  if(m_es.aabb_max.at(entity_index)[0] > m_global_boundary[0]){
-    m_es.moveEntity_NonVarlet(entity_index,Eigen::Vector2f{m_global_boundary[0]-m_es.aabb_max.at(entity_index)[0],0.0f});
+  if(m_es.aabb_max.at(entity_index).x > m_global_boundary.x){
+    m_es.moveEntity_NonVarlet(entity_index,{m_global_boundary.x-m_es.aabb_max.at(entity_index).x,0.0f});
   }
-  if(m_es.aabb_max.at(entity_index)[1] > m_global_boundary[1]){
-    m_es.moveEntity_NonVarlet(entity_index,Eigen::Vector2f{0.0f,m_global_boundary[1]-m_es.aabb_max.at(entity_index)[1]});
+  if(m_es.aabb_max.at(entity_index).y > m_global_boundary.y){
+    m_es.moveEntity_NonVarlet(entity_index,{0.0f,m_global_boundary.y-m_es.aabb_max.at(entity_index).y});
   }
 }
 
 void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uint32_t id2){
   
       auto collision_vector = m_es.positions[id1] - m_es.positions[id2];
-      float dist = collision_vector.norm();
+      float dist = collision_vector.length();
            
       if(dist < m_es.ps.radius[id1] + m_es.ps.radius[id2]){
-        float collisition_restitiution = (m_es.restitutions[id1] + m_es.restitutions[id2])/2.0f;
+        float collision_restitution = (m_es.restitutions[id1] + m_es.restitutions[id2])/2.0f;
         float mass_ratio_1 = m_es.masses[id1]/(m_es.masses[id1]+m_es.masses[id2]);
         float mass_ratio_2 = m_es.masses[id2]/(m_es.masses[id1]+m_es.masses[id2]);
         float delta = (dist - m_es.ps.radius[id1] - m_es.ps.radius[id2]) * 0.75;
+        auto move = collision_vector / dist * delta * mass_ratio_1 * (collision_restitution + 1.0f);
 
-        m_es.positions[id1] -= collision_vector / dist * delta * mass_ratio_2 * (collisition_restitiution + 1.0f);
-        m_es.positions[id2] += collision_vector / dist * delta * mass_ratio_1 * (collisition_restitiution + 1.0f);
+        m_es.moveEntity_NonVarlet(id1, move * -1.0f);
+        m_es.moveEntity_NonVarlet(id2, move );
+
       }
 }
 

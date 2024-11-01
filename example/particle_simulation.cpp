@@ -11,9 +11,8 @@ extern const float WINDOW_WIDTH = 800.0f;
  
 PhysicsWorld setup(){
   PhysicsWorld world;
-  float window[2] = {WINDOW_WIDTH,WINDOW_HEIGHT};
   world.addConstraint(std::make_shared<GlobalCollisionConstraint>(
-                      GlobalCollisionConstraint(world.getEntities(),world.getEs(), window)));
+                      GlobalCollisionConstraint(world.getEntities(),world.getEs(), {WINDOW_WIDTH,WINDOW_HEIGHT})));
   return world;
 }
 
@@ -22,8 +21,7 @@ PhysicsWorld setup(){
 std::shared_ptr<Particle> addParticle(float x, float y, PhysicsWorld & world){
   auto particle = std::make_shared<Particle>(Particle(PARTICLE_RADIUS, 1.0f, {x,y}));
   world.addEntity(particle);
-  float pos[2] = {x,y};
-  world.getEs().addParticleEntity(PARTICLE_RADIUS, 1.0f, pos);
+  world.getEs().addParticleEntity(PARTICLE_RADIUS, 1.0f, {x,y});
   return particle;
 }
 

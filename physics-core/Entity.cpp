@@ -1,5 +1,7 @@
 #include"Entity.h"
+#include "Vector.h"
 
+#include <cstdint>
 #include <utility>
 
 
@@ -16,14 +18,19 @@ void Entity::varlet(float dt){
   this->aabb.first += move;
   this->aabb.second += move;
 }
-void EntityStore::moveEntity_NonVarlet(uint32_t index, Eigen::Vector2f move_vector){
+void EntityStore::moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector){
   positions[index] += move_vector;
   aabb_max[index] += move_vector;
   aabb_min[index] += move_vector;
 }
+void EntityStore::setParticleEntityPosition(uint32_t index, physics_type::Vector2 position){
+  positions[index] = position;
+  aabb_max[index] = {position.x + ps.radius[index], position.y + ps.radius[index]};
+  aabb_min[index] = {position.x - ps.radius[index], position.y - ps.radius[index]};
+}
 
 
-void EntityStore::addParticleEntity(float radius, float mass, float position[2], float restitution){
+void EntityStore::addParticleEntity(float radius, float mass, physics_type::Vector2 position, float restitution){
   ps.radius.emplace_back(radius);
   positions.emplace_back(position);
   old_positions.emplace_back(position);
@@ -31,13 +38,13 @@ void EntityStore::addParticleEntity(float radius, float mass, float position[2],
   masses.emplace_back(mass);
   forces.emplace_back();
   ps.entity_index.emplace_back(positions.size() - 1);
-  float aabb_max_[2] = {position[0] + radius, position[1] + radius};
-  float aabb_min_[2] = {position[0] - radius, position[1] - radius};
+  physics_type::Vector2 aabb_max_{position.x + radius, position.y + radius};
+  physics_type::Vector2 aabb_min_{position.x - radius, position.y - radius};
   aabb_max.emplace_back(aabb_max_);
   aabb_min.emplace_back(aabb_min_);
 }
 
-void EntityStore::applyForce(uint32_t index, Eigen::Vector2f force_vector){
+void EntityStore::applyForce(uint32_t index, physics_type::Vector2 force_vector){
   forces[index] = std::move(force_vector);
 }
 

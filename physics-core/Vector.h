@@ -25,6 +25,7 @@ class Vector2{
     Vector2 unit();
 };
 
-}  
+}
 
+  
 #endif //VECTOR2_H

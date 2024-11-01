@@ -1,18 +1,17 @@
 #include "BroadPhaseGrid.h"
 #include <algorithm>
-#include <Eigen/Dense>
 #include <cmath>
 #include <cstdint>
 #include <unordered_set>
 #include <utility>
 
 
-std::pair<uint32_t,uint32_t> BroadPhaseGrid::getGridFromPosition(Eigen::Vector2f position){
-  return std::make_pair(position[0] * m_grid_dimensions.first / m_bounds.x, 
-                        position[1] * m_grid_dimensions.second / m_bounds.y);
+std::pair<uint32_t,uint32_t> BroadPhaseGrid::getGridFromPosition(physics_type::Vector2 position){
+  return std::make_pair(position.x * m_grid_dimensions.first / m_bounds.x, 
+                        position.y * m_grid_dimensions.second / m_bounds.y);
 }
 
-void BroadPhaseGrid::updatedGrid(std::vector<Eigen::Vector2f> aabb_min, std::vector<Eigen::Vector2f> aabb_max){
+void BroadPhaseGrid::updatedGrid(std::vector<physics_type::Vector2> aabb_min, std::vector<physics_type::Vector2> aabb_max){
   num_entities = aabb_min.size();
   uint32_t dimentions = std::sqrt(num_entities);
   m_grid_dimensions = std::make_pair(dimentions,dimentions );

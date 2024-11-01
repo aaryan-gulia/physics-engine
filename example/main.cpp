@@ -46,7 +46,7 @@ int main(){
 
     auto es = world.getEs();
     for (uint32_t i =0; i < es.positions.size(); i++){
-      DrawCircle(es.positions[i][0], es.positions[i][1], es.ps.radius[i], BLUE);
+      DrawCircle(es.positions[i].x, es.positions[i].y, es.ps.radius[i], BLUE);
     }
 
     world.update(frame_time);   

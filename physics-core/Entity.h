@@ -2,9 +2,8 @@
 #include <cstdint>
 #include <emmintrin.h>
 #include <utility>
-#include <Eigen/Dense>
+#include <vector>
 
-using Eigen::Vector2f;
 
 struct ParticleStore{
   std::vector<uint32_t> entity_index;
@@ -12,19 +11,20 @@ struct ParticleStore{
 };
 
 struct EntityStore{
-  std::vector<Eigen::Vector2f> positions;
-  std::vector<Eigen::Vector2f> old_positions;
-  std::vector<Eigen::Vector2f> forces;
+  std::vector<physics_type::Vector2> positions;
+  std::vector<physics_type::Vector2> old_positions;
+  std::vector<physics_type::Vector2> forces;
   std::vector<float> masses;
   std::vector<float> restitutions;
-  std::vector<Eigen::Vector2f> aabb_min;
-  std::vector<Eigen::Vector2f> aabb_max;
+  std::vector<physics_type::Vector2> aabb_min;
+  std::vector<physics_type::Vector2> aabb_max;
   ParticleStore ps;
 
-  void moveEntity_NonVarlet(uint32_t index, Eigen::Vector2f move_vector);
-  void applyForce(uint32_t index, Eigen::Vector2f force_vector);
+  void moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector);
+  void setParticleEntityPosition(uint32_t index, physics_type::Vector2 position);
+  void applyForce(uint32_t index, physics_type::Vector2 force_vector);
   void varletStep(float dt);
-  void addParticleEntity(float radius, float mass, float position[2], float restitution = 0.0f);
+  void addParticleEntity(float radius, float mass, physics_type::Vector2 position, float restitution = 0.0f);
 };
 
 

@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include "Eigen/Dense"
 
 struct pair_hash {
     template <class T1, class T2>
@@ -21,8 +20,8 @@ struct pair_hash {
 class BroadPhaseGrid{
   public:
     BroadPhaseGrid(){};
-    void updatedGrid(std::vector<Eigen::Vector2f> aabb_min, std::vector<Eigen::Vector2f> aabb_max);
-    std::pair<uint32_t,uint32_t> getGridFromPosition(Eigen::Vector2f position);
+    void updatedGrid(std::vector<physics_type::Vector2> aabb_min, std::vector<physics_type::Vector2> aabb_max);
+    std::pair<uint32_t,uint32_t> getGridFromPosition(physics_type::Vector2 position);
     std::unordered_set<uint32_t> getBoundaryIndices();
     std::vector<std::pair<uint32_t,uint32_t> > getCollisionIndices();
         
