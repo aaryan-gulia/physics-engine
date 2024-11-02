@@ -3,8 +3,10 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <iostream>
 
 void GlobalCollisionConstraint::apply(){
+  for (uint32_t sub_step = 0;sub_step < 5 ; sub_step++) {
   m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
   auto boundaryEntities = m_collision_grid.getBoundaryIndices();
   //auto collisionEntities = m_collision_grid.getCollisionIndices();
@@ -12,7 +14,7 @@ void GlobalCollisionConstraint::apply(){
   for(auto entity: boundaryEntities){
     applyGlobalBoundary(entity);
   }
-
+  //std::cout<<m_collision_grid.m_dense_grid.size()<<std::endl;
   for(auto grid_cell: m_collision_grid.m_dense_grid){
     auto collisionEntities = grid_cell.second;
     for(uint32_t i = 0; i < collisionEntities.size(); i++){
@@ -22,6 +24,8 @@ void GlobalCollisionConstraint::apply(){
         //}
       }
     }
+  }
+  
   }
 
 }

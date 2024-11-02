@@ -1,5 +1,7 @@
 #include"PhysicsWorld.h"
+#include <cstdint>
 #include <memory>
+#include <string>
 #include <sys/fcntl.h>
 #include"raylib.h"
 #include<iostream>
@@ -29,7 +31,6 @@ int main(){
 
     auto frame_time = GetFrameTime();    
     ClearBackground(BLACK);
-    DrawFPS(10, 10);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
       starting_pos = {GetMousePosition().x, GetMousePosition().y};
     }
@@ -41,14 +42,16 @@ int main(){
       addParticle(GetMousePosition().x, GetMousePosition().y, world);
     }
     if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){
-      addRigidBody(GetMousePosition().x,GetMousePosition().y ,world );
+      addParticle(GetMousePosition().x,GetMousePosition().y ,world );
     }
 
     auto es = world.getEs();
-    for (uint32_t i =0; i < es.positions.size(); i++){
-      DrawCircle(es.positions[i].x, es.positions[i].y, es.ps.radius[i], BLUE);
+    uint32_t entity_count;
+    for (entity_count =0; entity_count< es.positions.size(); entity_count++){
+      DrawCircle(es.positions[entity_count].x, es.positions[entity_count].y, es.ps.radius[entity_count], BLUE);
     }
-
+    DrawText(std::string("Entity Counter: ").append(std::to_string(entity_count)).c_str(), 5.0, 40.0, 20.0, WHITE);
+    DrawFPS(5, 10);
     world.update(frame_time);   
     
     EndDrawing();

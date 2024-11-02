@@ -23,6 +23,7 @@ struct EntityStore{
   void moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector);
   void setParticleEntityPosition(uint32_t index, physics_type::Vector2 position);
   void applyForce(uint32_t index, physics_type::Vector2 force_vector);
+  void updateAABB(uint32_t index);
   void varletStep(float dt);
   void addParticleEntity(float radius, float mass, physics_type::Vector2 position, float restitution = 0.0f);
 };

@@ -8,8 +8,8 @@
 
 class Constraint{
   public: 
-    virtual void apply()=0;
     virtual ~Constraint() = default;
+    virtual void apply() = 0;
 };
 
 class GlobalCollisionConstraint : public Constraint{
@@ -21,7 +21,8 @@ class GlobalCollisionConstraint : public Constraint{
 
   public:
     GlobalCollisionConstraint(std::vector<std::shared_ptr<Entity>>& entities, EntityStore& es, 
-                     physics_type::Vector2 global_boundary): m_entities(entities), m_es(es), m_global_boundary(global_boundary){}
+                     physics_type::Vector2 global_boundary): m_entities(entities), m_es(es),
+                     m_global_boundary(global_boundary), m_collision_grid(global_boundary){}
     virtual void apply() override;
 
   private:

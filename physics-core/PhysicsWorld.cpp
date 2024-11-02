@@ -1,27 +1,33 @@
 #include"PhysicsWorld.h"
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 
 void PhysicsWorld::update(float _frame_time=0.0f){
   accumulateForces();
-  varlet();
-  for(uint32_t i{0}; i < this->sub_steps; ++i){
+  for(uint32_t i = 0; i <= sub_steps; ++i){
+    varlet();
     satisfyConstraints();
   }
 }
 
 void PhysicsWorld::varlet(){
-  for(auto& particle: entities){
-    particle->varlet(this->dt);
-    particle->force = {0.0f,0.0f};
+  auto curr_time = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<float> dt = curr_time - last_varlet_time;
+  for(uint32_t i = 0; i <= uint32_t(dt.count() / 0.02f); i++){
+    es.varletStep(0.01f);
   }
-  es.varletStep(dt);
+  last_varlet_time = curr_time;
 }
 
 void PhysicsWorld::satisfyConstraints(){
   for(auto & constraint: constraints){
-    constraint->apply();
+    auto gbc = std::dynamic_pointer_cast<GlobalCollisionConstraint>(constraint);
+    if (gbc) {
+      gbc ->apply();
+    }
+    else constraint->apply();
   }
 }
 

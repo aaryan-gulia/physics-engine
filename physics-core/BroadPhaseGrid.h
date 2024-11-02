@@ -19,7 +19,7 @@ struct pair_hash {
 
 class BroadPhaseGrid{
   public:
-    BroadPhaseGrid(){};
+    BroadPhaseGrid(physics_type::Vector2 bounds):m_bounds(bounds){};
     void updatedGrid(std::vector<physics_type::Vector2> aabb_min, std::vector<physics_type::Vector2> aabb_max);
     std::pair<uint32_t,uint32_t> getGridFromPosition(physics_type::Vector2 position);
     std::unordered_set<uint32_t> getBoundaryIndices();

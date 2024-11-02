@@ -5,7 +5,7 @@
 #include <memory>
 
 
-extern const float PARTICLE_RADIUS = 10.0f;
+extern const float PARTICLE_RADIUS = 5.0f;
 extern const float WINDOW_HEIGHT = 450.0f;
 extern const float WINDOW_WIDTH = 800.0f;
  

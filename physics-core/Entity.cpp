@@ -20,8 +20,7 @@ void Entity::varlet(float dt){
 }
 void EntityStore::moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector){
   positions[index] += move_vector;
-  aabb_max[index] += move_vector;
-  aabb_min[index] += move_vector;
+    updateAABB(index);
 }
 void EntityStore::setParticleEntityPosition(uint32_t index, physics_type::Vector2 position){
   positions[index] = position;
@@ -48,6 +47,10 @@ void EntityStore::applyForce(uint32_t index, physics_type::Vector2 force_vector)
   forces[index] = std::move(force_vector);
 }
 
+void EntityStore::updateAABB(uint32_t index){
+  aabb_max[index] = {positions[index].x + ps.radius[index], positions[index].y + ps.radius[index]};
+  aabb_min[index] = {positions[index].x - ps.radius[index], positions[index].y - ps.radius[index]};
+}
 
 void EntityStore::varletStep(float dt){
   for(uint32_t i = 0; i< positions.size(); i++){
