@@ -8,7 +8,7 @@
 
 class PhysicsWorld{
   EntityStore es;
-  std::vector<std::shared_ptr<Entity>> entities;
+  std::vector<Entity*> entities;
   std::vector<std::shared_ptr<Constraint>> constraints;
   physics_type::Vector2 gravity = {0.0f, 1000.0f};
   uint32_t sub_steps = 1;
@@ -16,9 +16,14 @@ class PhysicsWorld{
 
   public:
     void update(float frame_time);
-    void addEntity(std::shared_ptr<Entity> entity);
+
+    // Returns the Index of the entity from es (EntityStore). User must use the index to access entity;
+    uint32_t addParticleEntity(float radius, float mass, float x_position, float y_position, float restitution = 0.0f);
+
+    void removeEntity(uint32_t index);
+    void addForceToEntity(uint32_t index, float x_force, float y_force);
+    
     void addConstraint(std::shared_ptr<Constraint> constraint);
-    std::vector<std::shared_ptr<Entity>>& getEntities();
     EntityStore& getEs();
     
   private:

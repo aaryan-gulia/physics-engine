@@ -8,7 +8,6 @@ void PhysicsWorld::update(float _frame_time=0.0f){
   accumulateForces();
   for(uint32_t i = 0; i <= sub_steps; ++i){
     varlet();
-    satisfyConstraints();
   }
 }
 
@@ -17,6 +16,7 @@ void PhysicsWorld::varlet(){
   std::chrono::duration<float> dt = curr_time - last_varlet_time;
   for(uint32_t i = 0; i <= uint32_t(dt.count() / 0.02f); i++){
     es.varletStep(0.01f);
+    satisfyConstraints();
   }
   last_varlet_time = curr_time;
 }
