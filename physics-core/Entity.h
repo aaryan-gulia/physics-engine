@@ -2,28 +2,32 @@
 #include "Vector.h"
 #include <cstdint>
 
+#pragma once
 
 class Entity{
-  EntityStore& m_es;
-  uint32_t m_id;
+
+  protected:
 
   public:
-  Entity(EntityStore& es, uint32_t id):m_es(es),m_id(id){}
-  virtual void varlet(float dt) = 0;
+  virtual uint32_t id() = 0;
+  // virtual void varlet(float dt) = 0;
   virtual ~Entity() = default;  // Make Entity polymorphic 
 };
 
 
 class Particle : public Entity{
+  EntityStore& m_es;
+  uint32_t m_id;
+  
   public:
-
+    
     Particle(EntityStore& es, float radius, float mass, physics_type::Vector2 position, float restitution = 0.0f):
-    Entity(es,es.positions.size()){
-      es.addParticleEntity(radius,mass,position,restitution);
+    m_es(es),m_id(es.positions.size()){
     }
-    void varlet(float dt);
-    ~Particle(){
-      m_es.restitutions;
+    // void varlet(float dt);
+    uint32_t id() override {return m_id;}
+    ~Particle() override {
+      m_es.removeParticleEntity(m_id);
     }
 };
 

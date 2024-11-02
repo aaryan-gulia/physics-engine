@@ -14,14 +14,12 @@ class Constraint{
 
 class GlobalCollisionConstraint : public Constraint{
   EntityStore& m_es;
-  std::vector<std::shared_ptr<Entity>> & m_entities;
-  std::vector<std::pair<physics_type::Vector2,physics_type::Vector2>> m_aabb_vec;
   physics_type::Vector2 m_global_boundary;
   BroadPhaseGrid m_collision_grid;
 
   public:
-    GlobalCollisionConstraint(std::vector<std::shared_ptr<Entity>>& entities, EntityStore& es, 
-                     physics_type::Vector2 global_boundary): m_entities(entities), m_es(es),
+    GlobalCollisionConstraint(EntityStore& es, 
+                     physics_type::Vector2 global_boundary):m_es(es),
                      m_global_boundary(global_boundary), m_collision_grid(global_boundary){}
     virtual void apply() override;
 

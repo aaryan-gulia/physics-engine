@@ -4,7 +4,6 @@ project(physics-core)
 
 add_library(${PROJECT_NAME} 
   PhysicsWorld.cpp 
-  Particle.cpp 
   Vector.cpp 
   Constraint.cpp 
   Entity.cpp 

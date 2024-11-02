@@ -1,7 +1,8 @@
 #include "EntityStore.h"
 #include <algorithm>
 #include <cstdint>
-
+#include "iostream"
+#include <cassert>
 void EntityStore::moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector){
   positions[index] += move_vector;
     updateAABB(index);
@@ -44,7 +45,13 @@ void EntityStore::removeParticleEntity(uint32_t idx){
 }
 
 void EntityStore::applyForce(uint32_t index, physics_type::Vector2 force_vector){
-  forces[index] = std::move(force_vector);
+  forces[index] += force_vector;
+}
+
+void EntityStore::clearForces(){
+  for(auto& force: forces){
+    force = {0.0f,0.0f};
+  }
 }
 
 void EntityStore::updateAABB(uint32_t index){

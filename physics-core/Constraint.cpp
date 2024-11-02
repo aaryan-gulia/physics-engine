@@ -18,9 +18,9 @@ void GlobalCollisionConstraint::apply(){
     auto collisionEntities = grid_cell.second;
     for(uint32_t i = 0; i < collisionEntities.size(); i++){
       for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
-        if(aabbOverlapCheck(collisionEntities[i], collisionEntities[j])){
+       // if(aabbOverlapCheck(collisionEntities[i], collisionEntities[j])){
           applyGlobalCollisionResolution(collisionEntities[i],collisionEntities[j]);
-        }
+       // }
       }
     }
   }
