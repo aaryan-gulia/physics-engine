@@ -25,6 +25,7 @@ class GlobalCollisionConstraint : public Constraint{
     virtual void apply() override;
 
   private:
+    bool aabbOverlapCheck(uint32_t id1, uint32_t id2);
     void applyGlobalBoundary(uint32_t entity_index);
     void applyGlobalCollisionResolution(uint32_t id1, uint32_t id2);
     void updateAABBVec();

@@ -1,5 +1,8 @@
 #include"Constraint.h"
+#include <cmath>
+#include <cstdint>
 #include <memory>
+#include <string>
 
 void GlobalCollisionConstraint::apply(){
   m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
@@ -14,7 +17,9 @@ void GlobalCollisionConstraint::apply(){
     auto collisionEntities = grid_cell.second;
     for(uint32_t i = 0; i < collisionEntities.size(); i++){
       for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
-        applyGlobalCollisionResolution(collisionEntities[i],collisionEntities[j]);
+        //if(aabbOverlapCheck(collisionEntities[i], collisionEntities[j])){
+          applyGlobalCollisionResolution(collisionEntities[i],collisionEntities[j]);
+        //}
       }
     }
   }
@@ -37,20 +42,34 @@ void GlobalCollisionConstraint::applyGlobalBoundary(uint32_t entity_index){
   }
 }
 
+bool GlobalCollisionConstraint::aabbOverlapCheck(uint32_t id1, uint32_t id2){
+  float d1x = m_es.aabb_min[id2].x - m_es.aabb_max[id1].x;
+  float d1y = m_es.aabb_min[id2].y- m_es.aabb_max[id1].y;
+  float d2x = m_es.aabb_min[id1].x - m_es.aabb_max[id2].y;
+  float d2y = m_es.aabb_min[id1].x - m_es.aabb_max[id2].y;
+
+  if (d1x > 0.0f || d1y > 0.0f || d2x > 0.0f || d2y > 0.0f){
+    return false;
+  }
+
+  return true;
+}
+
 void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uint32_t id2){
   
-      auto collision_vector = m_es.positions[id1] - m_es.positions[id2];
-      float dist = collision_vector.length();
-           
-      if(dist < m_es.ps.radius[id1] + m_es.ps.radius[id2]){
+      float dist_squared = m_es.positions[id1].distance_squared(m_es.positions[id2]);
+      float min_distance =  m_es.ps.radius[id1] + m_es.ps.radius[id2];
+      if(dist_squared < min_distance * min_distance) {
+        float dist = std::sqrt(dist_squared);
         float collision_restitution = (m_es.restitutions[id1] + m_es.restitutions[id2])/2.0f;
         float mass_ratio_1 = m_es.masses[id1]/(m_es.masses[id1]+m_es.masses[id2]);
         float mass_ratio_2 = m_es.masses[id2]/(m_es.masses[id1]+m_es.masses[id2]);
-        float delta = (dist - m_es.ps.radius[id1] - m_es.ps.radius[id2]) * 0.75;
-        auto move = collision_vector / dist * delta * mass_ratio_1 * (collision_restitution + 1.0f);
+        float delta = (dist - min_distance) * 0.75f;
+        auto move = (m_es.positions[id1] - m_es.positions[id2]) 
+                    / dist * delta  * (collision_restitution + 1.0f);
 
-        m_es.moveEntity_NonVarlet(id1, move * -1.0f);
-        m_es.moveEntity_NonVarlet(id2, move );
+        m_es.moveEntity_NonVarlet(id1, move * -1.0f * mass_ratio_2);
+        m_es.moveEntity_NonVarlet(id2, move * mass_ratio_1);
 
       }
 }
