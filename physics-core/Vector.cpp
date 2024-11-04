@@ -41,3 +41,15 @@ float Vector2::length_squared(){
 Vector2 Vector2::unit(){
   return (*this/this->length());
 }
+
+// void* operator new(size_t size){
+//   s_AllocationMetrics.TotalAllocated += size;
+
+//   return malloc(size);
+// }
+
+// void operator delete(void* memory, size_t size){
+//   s_AllocationMetrics.TotalFreed += size;
+
+//   free(memory);
+// }

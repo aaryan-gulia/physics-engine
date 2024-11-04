@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <sys/fcntl.h>
+#include "Vector.h"
 #include"raylib.h"
 #include<iostream>
 
@@ -15,6 +16,17 @@ uint32_t addParticle(float x, float y, float radius_scale, PhysicsWorld & world)
 std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_begin, float x_end, float y_end, 
                                                         PhysicsWorld & world);
 void addRigidBody(float x, float y, PhysicsWorld& world);
+void* operator new(size_t size){
+  s_AllocationMetrics.TotalAllocated += size;
+
+  return malloc(size);
+}
+
+void operator delete(void* memory, size_t size){
+  s_AllocationMetrics.TotalFreed += size;
+
+  free(memory);
+}
 
 
 int main(){
@@ -69,6 +81,8 @@ int main(){
       DrawCircle(es.positions[entity_count].x, es.positions[entity_count].y, es.ps.radius[entity_count], BLUE);
     }
     DrawText(std::string("Entity Counter: ").append(std::to_string(entity_count)).c_str(), 5.0, 40.0, 20.0, WHITE);
+    DrawText(std::string("Memory Usage: ").append(std::to_string(s_AllocationMetrics.CurrentUsage())).c_str(),
+             5.0,60.0,20.0, WHITE);
     DrawFPS(5, 10);
     world.update(frame_time);   
     

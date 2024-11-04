@@ -1,7 +1,8 @@
+#pragma once
 
-#ifndef VECTOR2_H
-#define VECTOR2_H
-
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 namespace physics_type{
   
 class Vector2{
@@ -27,5 +28,14 @@ class Vector2{
 
 }
 
-  
-#endif //VECTOR2_H
+struct AllocationMetrics{
+  uint32_t TotalAllocated = 0;
+  uint32_t TotalFreed = 0;
+
+  uint32_t CurrentUsage() {return TotalAllocated - TotalFreed;}
+};
+
+static AllocationMetrics s_AllocationMetrics;
+
+// void* operator new(size_t size);
+// void operator delete(void* memory, size_t size);

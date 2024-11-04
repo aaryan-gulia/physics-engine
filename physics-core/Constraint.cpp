@@ -6,7 +6,6 @@
 #include <iostream>
 
 void GlobalCollisionConstraint::apply(){
-  for (uint32_t sub_step = 0;sub_step < 5 ; sub_step++) {
   m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
   auto boundaryEntities = m_collision_grid.getBoundaryIndices();
   
@@ -25,8 +24,6 @@ void GlobalCollisionConstraint::apply(){
     }
   }
   
-  }
-
 }
 
 
@@ -69,7 +66,7 @@ void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uin
         float mass_ratio_2 = m_es.masses[id2]/(m_es.masses[id1]+m_es.masses[id2]);
         float delta = (dist - min_distance);
         auto move = (m_es.positions[id1] - m_es.positions[id2]) 
-                    / dist * delta  * (collision_restitution + 1.0f);
+                    / dist * delta  * (collision_restitution + 1.0f) * 0.75f;
 
         m_es.moveEntity_NonVarlet(id1, move * -1.0f * mass_ratio_2);
         m_es.moveEntity_NonVarlet(id2, move * mass_ratio_1);
