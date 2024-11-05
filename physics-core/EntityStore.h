@@ -35,12 +35,12 @@ struct EntityStore{
       std::cout << "Initial size of positions: " << positions.size() << std::endl;
   }
 
-  void moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector);
-  void setParticleEntityPosition(uint32_t index, physics_type::Vector2 position);
-  void applyForce(uint32_t index, physics_type::Vector2 force_vector);
+  void moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector);
+  void setParticleEntityPosition(uint32_t index, const physics_type::Vector2& position);
+  void applyForce(uint32_t index, const physics_type::Vector2& force_vector);
   void updateAABB(uint32_t index);
   void varletStep(float dt);
-  void addParticleEntity(float radius, float mass, physics_type::Vector2 position, float restitution = 0.0f);
+  void addParticleEntity(float radius, float mass, const physics_type::Vector2& position, float restitution = 0.0f);
   void removeParticleEntity(uint32_t idx);
   void clearForces();
 };

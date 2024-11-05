@@ -56,7 +56,7 @@ bool GlobalCollisionConstraint::aabbOverlapCheck(uint32_t id1, uint32_t id2){
 }
 
 void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uint32_t id2){
-  
+    const float COLLISION_DAMPENING = 0.75f;
       float dist_squared = m_es.positions[id1].distance_squared(m_es.positions[id2]);
       float min_distance =  m_es.ps.radius[id1] + m_es.ps.radius[id2];
       if(dist_squared < min_distance * min_distance) {
@@ -66,9 +66,9 @@ void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uin
         float mass_ratio_2 = m_es.masses[id2]/(m_es.masses[id1]+m_es.masses[id2]);
         float delta = (dist - min_distance);
         auto move = (m_es.positions[id1] - m_es.positions[id2]) 
-                    / dist * delta  * (collision_restitution + 1.0f) * 0.75f;
+                    * ((delta * COLLISION_DAMPENING / dist)  * (collision_restitution + 1.0f));
 
-        m_es.moveEntity_NonVarlet(id1, move * -1.0f * mass_ratio_2);
+        m_es.moveEntity_NonVarlet(id1, move * (-1.0f * mass_ratio_2));
         m_es.moveEntity_NonVarlet(id2, move * mass_ratio_1);
 
       }

@@ -3,18 +3,18 @@
 #include <cstdint>
 #include "iostream"
 #include <cassert>
-void EntityStore::moveEntity_NonVarlet(uint32_t index, physics_type::Vector2 move_vector){
+void EntityStore::moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector){
   positions[index] += move_vector;
     updateAABB(index);
 }
-void EntityStore::setParticleEntityPosition(uint32_t index, physics_type::Vector2 position){
+void EntityStore::setParticleEntityPosition(uint32_t index,const physics_type::Vector2& position){
   positions[index] = position;
   aabb_max[index] = {position.x + ps.radius[index], position.y + ps.radius[index]};
   aabb_min[index] = {position.x - ps.radius[index], position.y - ps.radius[index]};
 }
 
 
-void EntityStore::addParticleEntity(float radius, float mass, physics_type::Vector2 position, float restitution){
+void EntityStore::addParticleEntity(float radius, float mass, const physics_type::Vector2& position, float restitution){
   ps.radius.emplace_back(radius);
   positions.emplace_back(position);
   old_positions.emplace_back(position);
@@ -44,7 +44,7 @@ void EntityStore::removeParticleEntity(uint32_t idx){
   aabb_min.erase(aabb_min.begin() + idx);
 }
 
-void EntityStore::applyForce(uint32_t index, physics_type::Vector2 force_vector){
+void EntityStore::applyForce(uint32_t index, const physics_type::Vector2& force_vector){
   forces[index] += force_vector;
 }
 
@@ -55,8 +55,10 @@ void EntityStore::clearForces(){
 }
 
 void EntityStore::updateAABB(uint32_t index){
-  aabb_max[index] = {positions[index].x + ps.radius[index], positions[index].y + ps.radius[index]};
-  aabb_min[index] = {positions[index].x - ps.radius[index], positions[index].y - ps.radius[index]};
+  aabb_max[index].x = positions[index].x + ps.radius[index];
+  aabb_max[index].y = positions[index].y + ps.radius[index];
+  aabb_min[index].x = positions[index].x - ps.radius[index];
+  aabb_min[index].y = positions[index].y - ps.radius[index];
 }
 
 void EntityStore::varletStep(float dt){

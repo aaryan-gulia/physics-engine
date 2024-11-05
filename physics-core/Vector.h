@@ -12,18 +12,18 @@ class Vector2{
   public:
     Vector2() = default;
     Vector2(double x, double y):x(x),y(y){};
-    Vector2 operator+(const Vector2& vec);
-    Vector2 operator-(const Vector2& vec);
+    Vector2 operator+(const Vector2& vec) const;
+    Vector2 operator-(const Vector2& vec) const;
     void operator+=(const Vector2& vec);
     void operator-=(const Vector2& vec);
-    bool const operator==(const Vector2& vec);
-    Vector2 operator*(double scalar);
-    Vector2 operator/(double scalar);
-    float distance(const Vector2& vec1);
-    float distance_squared(const Vector2& vec1);
+    bool operator==(const Vector2& vec) const;
+    Vector2 operator*(double scalar) const;
+    Vector2 operator/(double scalar) const;
+    float distance(const Vector2& vec1) const;
+    float distance_squared(const Vector2& vec1) const;
     float length_squared();
-    float length();
-    Vector2 unit();
+    float length() const;
+    Vector2 unit() const;
 };
 
 }
