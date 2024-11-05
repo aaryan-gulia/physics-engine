@@ -11,27 +11,44 @@ extern const float PARTICLE_RADIUS;
 extern const float WINDOW_HEIGHT;
 extern const float WINDOW_WIDTH;
 
+void* operator new(size_t size){
+    s_AllocationMetrics.TotalAllocated ++;
+    return malloc(size);
+}
+void* operator new[](size_t size){
+    s_AllocationMetrics.TotalAllocated ++;
+    return malloc(size);
+}
+
+void operator delete(void* memory) noexcept{
+    s_AllocationMetrics.TotalFreed ++;
+    free(memory);
+}
+
+void operator delete[](void* memory) noexcept{
+    s_AllocationMetrics.TotalFreed ++;
+    free(memory);
+}
+
 PhysicsWorld setup();
 uint32_t addParticle(float x, float y, float radius_scale, PhysicsWorld & world);
 std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_begin, float x_end, float y_end, 
                                                         PhysicsWorld & world);
 void addRigidBody(float x, float y, PhysicsWorld& world);
 
-extern AllocationMetrics s_AllocationMetrics;
-
 int main(){
 
   PhysicsWorld world = setup();
   addParticle(200.0f, 200.0f, 2, world);
-  
+
   InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT ,"Particle Simulation Using Physics Engine" );
 
   physics_type::Vector2 starting_pos, ending_pos;
-  
+
   while(!WindowShouldClose()){
     BeginDrawing();
 
-    auto frame_time = GetFrameTime();    
+    auto frame_time = GetFrameTime();
     ClearBackground(BLACK);
     // if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
     //   starting_pos = {GetMousePosition().x, GetMousePosition().y};
@@ -71,11 +88,11 @@ int main(){
       DrawCircle(es.positions[entity_count].x, es.positions[entity_count].y, es.ps.radius[entity_count], BLUE);
     }
     DrawText(std::string("Entity Counter: ").append(std::to_string(entity_count)).c_str(), 5.0, 40.0, 20.0, WHITE);
-    DrawText(std::string("Memory Usage: ").append(std::to_string(s_AllocationMetrics.TotalFreed)).c_str(),
+    DrawText(std::string("Memory Usage: ").append(std::to_string(s_AllocationMetrics.CurrentUsage())).c_str(),
              5.0,60.0,20.0, WHITE);
     DrawFPS(5, 10);
-    world.update(frame_time);   
-    
+    world.update(frame_time);
+
     EndDrawing();
   }
 }

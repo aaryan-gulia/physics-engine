@@ -32,10 +32,12 @@ struct AllocationMetrics{
   uint32_t TotalAllocated = 0;
   uint32_t TotalFreed = 0;
 
-  uint32_t CurrentUsage() {return TotalAllocated - TotalFreed;}
+  uint32_t CurrentUsage() const {return TotalAllocated - TotalFreed;}
 };
 static AllocationMetrics s_AllocationMetrics;
 
 
 void* operator new(size_t size);
-void operator delete(void* memory, size_t size) noexcept;
+void* operator new[](size_t size);
+void operator delete(void* memory) noexcept;
+void operator delete[](void* memory) noexcept;
