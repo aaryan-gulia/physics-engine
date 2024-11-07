@@ -5,7 +5,7 @@
 #include <cassert>
 void EntityStore::moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector){
   positions[index] += move_vector;
-    updateAABB(index);
+  updateAABB(index);
 }
 void EntityStore::setParticleEntityPosition(uint32_t index,const physics_type::Vector2& position){
   positions[index] = position;

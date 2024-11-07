@@ -17,13 +17,14 @@ void BroadPhaseGrid::updatedGrid(std::vector<physics_type::Vector2> aabb_min, st
   uint32_t dimensions = std::sqrt(num_entities);
   m_grid_dimensions = std::make_pair(dimensions, dimensions );
 
-  m_dense_grid = {};
+  m_dense_grid.clear();
 
   for(uint32_t i = 0; i <  num_entities; i++){
-    if(aabb_min[i].x < -m_bounds.x || aabb_min[i].y < -m_bounds.y
-    || aabb_max[i].x > 2*m_bounds.x || aabb_max[i].y > 2*m_bounds.y){
-        continue;
-    }
+    
+    // if(aabb_min[i].x < -m_bounds.x || aabb_min[i].y < -m_bounds.y
+    // || aabb_max[i].x > 2*m_bounds.x || aabb_max[i].y > 2*m_bounds.y){
+    //     continue;
+    // }
     auto min_grid = getGridFromPosition(aabb_min[i]);
     auto max_grid = getGridFromPosition(aabb_max[i]);
 

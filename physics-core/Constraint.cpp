@@ -17,9 +17,9 @@ void GlobalCollisionConstraint::apply(){
     auto collisionEntities = grid_cell.second;
     for(uint32_t i = 0; i < collisionEntities.size(); i++){
       for(uint32_t j = i + 1; j < collisionEntities.size(); j++){
-       // if(aabbOverlapCheck(collisionEntities[i], collisionEntities[j])){
+       if(aabbOverlapCheck(collisionEntities[i], collisionEntities[j])){
           applyGlobalCollisionResolution(collisionEntities[i],collisionEntities[j]);
-       // }
+       }
       }
     }
   }
@@ -45,8 +45,8 @@ void GlobalCollisionConstraint::applyGlobalBoundary(uint32_t entity_index){
 bool GlobalCollisionConstraint::aabbOverlapCheck(uint32_t id1, uint32_t id2){
   float d1x = m_es.aabb_min[id2].x - m_es.aabb_max[id1].x;
   float d1y = m_es.aabb_min[id2].y- m_es.aabb_max[id1].y;
-  float d2x = m_es.aabb_min[id1].x - m_es.aabb_max[id2].y;
-  float d2y = m_es.aabb_min[id1].x - m_es.aabb_max[id2].y;
+  float d2x = m_es.aabb_min[id1].x - m_es.aabb_max[id2].x;
+  float d2y = m_es.aabb_min[id1].y - m_es.aabb_max[id2].y;
 
   if (d1x > 0.0f || d1y > 0.0f || d2x > 0.0f || d2y > 0.0f){
     return false;
