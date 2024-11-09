@@ -24,6 +24,7 @@ class Vector2{
     float length_squared();
     float length() const;
     Vector2 unit() const;
+    float dot(const Vector2 vec) const;
 };
 
 }

@@ -179,7 +179,7 @@ std::unique_ptr<Entity> EntityStore::getEntity(uint32_t idx){
   }
 }
 
-size_t EntityStore::getParticleStoreIdx(uint32_t idx){
+size_t EntityStore::getParticleStoreIdx(uint32_t idx) const {
   auto particle_ptr = std::find(ps.entity_index.begin(), ps.entity_index.end(), idx);
   if (particle_ptr == ps.entity_index.end()){
     std::cerr << "idx NOT IN PARTICLE STORE";
@@ -188,7 +188,7 @@ size_t EntityStore::getParticleStoreIdx(uint32_t idx){
   return std::find(ps.entity_index.begin(), ps.entity_index.end(), idx) - ps.entity_index.begin();
 }
 
-size_t EntityStore::getRectangleStoreIdx(uint32_t idx){
+size_t EntityStore::getRectangleStoreIdx(uint32_t idx) const{
   auto rectangle_ptr = std::find(rs.entity_index.begin(), rs.entity_index.end(), idx);
   if (rectangle_ptr == rs.entity_index.end()){
     std::cerr << "idx NOT IN RECTANGLE STORE";

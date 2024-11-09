@@ -32,16 +32,17 @@ void operator delete[](void* memory) noexcept{
 
 PhysicsWorld setup();
 uint32_t addParticle(float x, float y, float radius_scale, PhysicsWorld & world);
-std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_begin, float x_end, float y_end, 
-                                                        PhysicsWorld & world);
-void addRigidBody(float x, float y, PhysicsWorld& world);
+// std::vector<std::shared_ptr<Particle>> addParticleChain(float x_begin, float y_begin, float x_end, float y_end, 
+//                                                         PhysicsWorld & world);
+// void addRigidBody(float x, float y, PhysicsWorld& world);
 
 int main(){
 
   PhysicsWorld world = setup();
   addParticle(200.0f, 200.0f, 2, world);
 
-  InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT ,"Particle Simulation Using Physics Engine" );
+  world.getEs().addRectangleEntity(40.0f, 40.0f, 1.0f, {250.0f,250.0f});
+  InitWindow(WINDOW_WIDTH,WINDOW_HEIGHT,"Particle Simulation Using Physics Engine" );
 
   physics_type::Vector2 starting_pos, ending_pos;
 
@@ -85,7 +86,18 @@ int main(){
     uint32_t entity_count;
     DrawCircle(es.positions[0].x, es.positions[0].y, es.ps.radius[0], RED);
     for (entity_count =1; entity_count< es.positions.size(); entity_count++){
-      DrawCircle(es.positions[entity_count].x, es.positions[entity_count].y, es.ps.radius[entity_count], BLUE);
+      if(es.entity_types[entity_count] == PARTICLE){
+        auto particle_idx = es.getParticleStoreIdx(entity_count);
+        DrawCircle(es.positions[entity_count].x, es.positions[entity_count].y, es.ps.radius[particle_idx], BLUE);
+      }
+      else if(es.entity_types[entity_count] == RECTANGLE){
+        auto rect_idx = es.getRectangleStoreIdx(entity_count);
+        DrawRectangle(es.positions[entity_count].x - 20, es.positions[entity_count].y - 20,
+                      es.rs.width[rect_idx] ,es.rs.height[rect_idx] , BLUE);
+        // DrawRectanglePro(Rectangle(es.rs.width[rect_idx], es.rs.height[rect_idx]), 
+        //                  {es.positions[entity_count].x, es.positions[entity_count].x}
+        //                  ,es.angle[entity_count],BLUE );
+      }
     }
     DrawText(std::string("Entity Counter: ").append(std::to_string(entity_count)).c_str(), 5.0, 40.0, 20.0, WHITE);
     DrawText(std::string("Memory Usage: ").append(std::to_string(s_AllocationMetrics.CurrentUsage())).c_str(),

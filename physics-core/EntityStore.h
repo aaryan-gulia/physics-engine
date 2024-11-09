@@ -54,8 +54,8 @@ struct EntityStore{
 
   // Entity Interfaces
   std::unique_ptr<physics_entity::Entity> getEntity(uint32_t idx);
-  size_t getParticleStoreIdx(uint32_t idx);
-  size_t getRectangleStoreIdx(uint32_t idx);
+  size_t getParticleStoreIdx(uint32_t idx) const;
+  size_t getRectangleStoreIdx(uint32_t idx) const;
 
 
   private: 
