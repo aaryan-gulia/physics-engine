@@ -29,7 +29,7 @@ void EntityStore::addParticleEntity(float radius, float mass, const physics_type
   aabb_max.emplace_back(aabb_max_);
   aabb_min.emplace_back(aabb_min_);
 
-  entity_types.emplace_back(EntityType::Particle);
+  entity_types.emplace_back(EntityType::PARTICLE);
 
   // unused for particle entities
   angle.emplace_back();
@@ -52,7 +52,25 @@ void EntityStore::addRectangleEntity(float width, float height, float mass, cons
   angle.emplace_back(0.0f);
   old_angle.emplace_back(0.0f);
 
-  entity_types.emplace_back(EntityType::Rectangle);
+  entity_types.emplace_back(EntityType::RECTANGLE);
+}
+
+void EntityStore::removeEntity(uint32_t idx){
+  if(entity_types[idx] == EntityType::PARTICLE){
+    removeParticleEntity(idx);
+  }
+  else if(entity_types[idx] == EntityType::RECTANGLE){
+    removeRectangleEntity(idx);
+  }
+  positions.erase(positions.begin() + idx);
+  old_positions.erase(old_positions.begin() + idx);
+  masses.erase(masses.begin() + idx);
+  forces.erase(forces.begin() + idx);
+  restitutions.erase(restitutions.begin() + idx);
+  aabb_max.erase(aabb_max.begin() + idx);
+  aabb_min.erase(aabb_min.begin() + idx);
+  angle.erase(angle.begin() + idx);
+  old_angle.erase(old_angle.begin() + idx);
 }
 
 void EntityStore::removeParticleEntity(uint32_t idx){
@@ -62,13 +80,16 @@ void EntityStore::removeParticleEntity(uint32_t idx){
     ps.entity_index.erase(particle_iter);
     ps.radius.erase(ps.radius.begin() + particle_idx);
   }
-  positions.erase(positions.begin() + idx);
-  old_positions.erase(old_positions.begin() + idx);
-  masses.erase(masses.begin() + idx);
-  forces.erase(forces.begin() + idx);
-  restitutions.erase(restitutions.begin() + idx);
-  aabb_max.erase(aabb_max.begin() + idx);
-  aabb_min.erase(aabb_min.begin() + idx);
+}
+
+void EntityStore::removeRectangleEntity(uint32_t idx){
+  auto rectangle_iter = std::find(rs.entity_index.begin(), rs.entity_index.end(), idx);
+  if(rectangle_iter != rs.entity_index.end()){
+    uint32_t rectangle_idx = rectangle_iter - rs.entity_index.begin();
+    rs.entity_index.erase(rectangle_iter);
+    rs.height.erase(rs.height.begin() + rectangle_idx);
+    rs.width.erase(rs.width.begin() + rectangle_idx);
+  }
 }
 
 void EntityStore::applyForce(uint32_t index, const physics_type::Vector2& force_vector){

@@ -5,8 +5,8 @@
 
 
 enum EntityType{
-  Particle,
-  Rectangle,
+  PARTICLE,
+  RECTANGLE,
 };
 
 struct ParticleStore{
@@ -58,11 +58,13 @@ struct EntityStore{
   void varletStep(float dt);
   void addParticleEntity(float radius, float mass, const physics_type::Vector2& position, float restitution = 0.0f);
   void addRectangleEntity(float width, float height, float mass, const physics_type::Vector2& positions, float restitution = 0.0f);
-  void removeParticleEntity(uint32_t idx);
+  void removeEntity(uint32_t idx);
   void clearForces();
 
 
   private: 
     void addEntity(float mass, float restitution, float position, const physics_type::Vector2& aabb_min, 
                    const physics_type::Vector2& aabb_max, float angle);
+  void removeParticleEntity(uint32_t idx);
+  void removeRectangleEntity(uint32_t idx);
 };
