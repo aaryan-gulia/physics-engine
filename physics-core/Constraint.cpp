@@ -1,9 +1,6 @@
 #include"Constraint.h"
 #include <cmath>
 #include <cstdint>
-#include <memory>
-#include <string>
-#include <iostream>
 
 void GlobalCollisionConstraint::apply(){
   m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
@@ -23,7 +20,7 @@ void GlobalCollisionConstraint::apply(){
       }
     }
   }
-  
+
 }
 
 

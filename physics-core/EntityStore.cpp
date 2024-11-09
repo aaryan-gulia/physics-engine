@@ -1,8 +1,10 @@
 #include "EntityStore.h"
 #include <algorithm>
 #include <cstdint>
+#include "Vector.h"
 #include "iostream"
 #include <cassert>
+#include <numeric>
 void EntityStore::moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector){
   positions[index] += move_vector;
   updateAABB(index);
@@ -26,6 +28,31 @@ void EntityStore::addParticleEntity(float radius, float mass, const physics_type
   physics_type::Vector2 aabb_min_{position.x - radius, position.y - radius};
   aabb_max.emplace_back(aabb_max_);
   aabb_min.emplace_back(aabb_min_);
+
+  entity_types.emplace_back(EntityType::Particle);
+
+  // unused for particle entities
+  angle.emplace_back();
+  old_angle.emplace_back();
+}
+
+void EntityStore::addRectangleEntity(float width, float height, float mass, const physics_type::Vector2& position, float restitution){
+  physics_type::Vector2 aabb_max_ = {position.x + width/2.0f, position.y + height/2.0f};
+  physics_type::Vector2 aabb_min_ = {position.x - width/2.0f, position.y - height/2.0f};
+  positions.emplace_back(position);
+  old_positions.emplace_back(position);
+  restitutions.emplace_back(restitution);
+  masses.emplace_back(mass);
+  forces.emplace_back();
+  rs.height.emplace_back(height);
+  rs.width.emplace_back(width);
+  rs.entity_index.emplace_back(positions.size() - 1);
+  aabb_max.emplace_back(aabb_max_);
+  aabb_min.emplace_back(aabb_min_);
+  angle.emplace_back(0.0f);
+  old_angle.emplace_back(0.0f);
+
+  entity_types.emplace_back(EntityType::Rectangle);
 }
 
 void EntityStore::removeParticleEntity(uint32_t idx){
