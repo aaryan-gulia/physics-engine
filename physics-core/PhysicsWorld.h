@@ -8,7 +8,6 @@
 
 class PhysicsWorld{
   EntityStore es;
-  std::vector<Entity*> entities;
   std::vector<std::shared_ptr<Constraint>> constraints;
   physics_type::Vector2 gravity = {0.0f, 1000.0f};
   uint32_t sub_steps = 1;

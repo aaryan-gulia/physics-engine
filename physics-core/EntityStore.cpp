@@ -1,13 +1,19 @@
 #include "EntityStore.h"
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
+#include "Entity.h"
 #include "Vector.h"
 #include "iostream"
 #include <cassert>
+#include <memory>
 #include <numeric>
+
+using namespace physics_entity;
+
 void EntityStore::moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector){
   positions[index] += move_vector;
-  updateAABB(index);
+  updateParticleAABB(index);
 }
 void EntityStore::setParticleEntityPosition(uint32_t index,const physics_type::Vector2& position){
   positions[index] = position;
@@ -24,21 +30,20 @@ void EntityStore::addParticleEntity(float radius, float mass, const physics_type
   masses.emplace_back(mass);
   forces.emplace_back();
   ps.entity_index.emplace_back(positions.size() - 1);
-  physics_type::Vector2 aabb_max_{position.x + radius, position.y + radius};
-  physics_type::Vector2 aabb_min_{position.x - radius, position.y - radius};
-  aabb_max.emplace_back(aabb_max_);
-  aabb_min.emplace_back(aabb_min_);
+  aabb_max.emplace_back(position.x + radius, position.y + radius);
+  aabb_min.emplace_back(position.x - radius, position.y - radius);
 
   entity_types.emplace_back(EntityType::PARTICLE);
 
   // unused for particle entities
   angle.emplace_back();
   old_angle.emplace_back();
+  torques.emplace_back();
+  moment_of_inertia.emplace_back();
 }
 
 void EntityStore::addRectangleEntity(float width, float height, float mass, const physics_type::Vector2& position, float restitution){
-  physics_type::Vector2 aabb_max_ = {position.x + width/2.0f, position.y + height/2.0f};
-  physics_type::Vector2 aabb_min_ = {position.x - width/2.0f, position.y - height/2.0f};
+  entity_types.emplace_back(EntityType::RECTANGLE);
   positions.emplace_back(position);
   old_positions.emplace_back(position);
   restitutions.emplace_back(restitution);
@@ -47,12 +52,13 @@ void EntityStore::addRectangleEntity(float width, float height, float mass, cons
   rs.height.emplace_back(height);
   rs.width.emplace_back(width);
   rs.entity_index.emplace_back(positions.size() - 1);
-  aabb_max.emplace_back(aabb_max_);
-  aabb_min.emplace_back(aabb_min_);
+  aabb_max.emplace_back(position.x + width/2.0f, position.y + height/2.0f);
+  aabb_min.emplace_back(position.x - width/2.0f, position.y - height/2.0f);
+
   angle.emplace_back(0.0f);
   old_angle.emplace_back(0.0f);
-
-  entity_types.emplace_back(EntityType::RECTANGLE);
+  torques.emplace_back();
+  moment_of_inertia.emplace_back(mass * (width * width + height * height) / 12.0f);
 }
 
 void EntityStore::removeEntity(uint32_t idx){
@@ -71,6 +77,8 @@ void EntityStore::removeEntity(uint32_t idx){
   aabb_min.erase(aabb_min.begin() + idx);
   angle.erase(angle.begin() + idx);
   old_angle.erase(old_angle.begin() + idx);
+  torques.erase(torques.begin() + idx);
+  moment_of_inertia.erase(moment_of_inertia.begin() + idx);
 }
 
 void EntityStore::removeParticleEntity(uint32_t idx){
@@ -102,21 +110,73 @@ void EntityStore::clearForces(){
   }
 }
 
-void EntityStore::updateAABB(uint32_t index){
+void EntityStore::updateParticleAABB(uint32_t index){
   aabb_max[index].x = positions[index].x + ps.radius[index];
   aabb_max[index].y = positions[index].y + ps.radius[index];
   aabb_min[index].x = positions[index].x - ps.radius[index];
   aabb_min[index].y = positions[index].y - ps.radius[index];
 }
 
-void EntityStore::varletStep(float dt){
+void EntityStore::varletStep(float dt, float dampening_coef){
   for(uint32_t i = 0; i< positions.size(); i++){
+    // TODO: NEED TO IMPLEMENT TIME INVARIANT VERSION OF VERLET INTEGRATOR
+    dampening_coef *= 10;
+    // position verlet 
     auto temp = positions[i];
-    positions[i] = positions[i] * 1.99f - old_positions[i] * 0.99f + forces[i] / masses[i] * dt * dt;
+    positions[i] = positions[i] * (2.0f - dampening_coef) - old_positions[i] * (1.0f - dampening_coef) 
+                   + forces[i] / masses[i] * dt * dt;
     old_positions[i] = temp;
     auto move = positions[i] - old_positions[i];
+
+    // TODO: DEVELOP UPDATE AABB METHODS FOR RECTANGLES
     aabb_max[i] += move;
     aabb_min[i] += move;
+
+    // angle verlet
+    auto temp_angle = angle[i];
+    angle[i] = angle[i] * (2.0f - dampening_coef) - old_angle[i] * (1.0f - dampening_coef) 
+               + torques[i] / moment_of_inertia[i] * dt * dt;
   }
 }
 
+std::unique_ptr<Entity> EntityStore::getEntity(uint32_t idx){
+  
+  if(entity_types[idx] == PARTICLE){
+    auto particle_iter = std::find(ps.entity_index.begin(), ps.entity_index.end(), idx);
+    uint32_t particle_idx = particle_iter - ps.entity_index.begin();
+    float& radius = ps.radius.at(particle_idx);
+    return std::make_unique<Particle>(Particle(positions[idx],angle[idx],forces[idx],masses[idx],restitutions[idx],radius));
+  }
+
+  else if(entity_types[idx] == RECTANGLE){
+    auto rectangle_iter = std::find(rs.entity_index.begin(), rs.entity_index.end(), idx);
+    uint32_t rectangle_idx = rectangle_iter - rs.entity_index.begin();
+    float& height = rs.height.at(rectangle_idx);
+    float& width = rs.width.at(rectangle_idx);
+    return std::make_unique<Rectangle>(Rectangle(positions[idx],angle[idx],forces[idx],masses[idx],restitutions[idx],
+                                                height, width));
+  }
+
+  else{
+    std::cerr << "UNKNOWN ENTITY" ;
+    return nullptr;
+  }
+}
+
+size_t EntityStore::getParticleStoreIdx(uint32_t idx){
+  auto particle_ptr = std::find(ps.entity_index.begin(), ps.entity_index.end(), idx);
+  if (particle_ptr == ps.entity_index.end()){
+    std::cerr << "idx NOT IN PARTICLE STORE";
+    return NULL;
+  }
+  return std::find(ps.entity_index.begin(), ps.entity_index.end(), idx) - ps.entity_index.begin();
+}
+
+size_t EntityStore::getRectangleStoreIdx(uint32_t idx){
+  auto rectangle_ptr = std::find(rs.entity_index.begin(), rs.entity_index.end(), idx);
+  if (rectangle_ptr == rs.entity_index.end()){
+    std::cerr << "idx NOT IN RECTANGLE STORE";
+    return NULL;
+  }
+  return std::find(rs.entity_index.begin(), rs.entity_index.end(), idx) - rs.entity_index.begin();
+}

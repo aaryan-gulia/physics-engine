@@ -1,5 +1,8 @@
 #include "Vector.h"
+#include "Entity.h"
+#include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <vector>
 #include <iostream>
 
@@ -29,37 +32,31 @@ struct EntityStore{
   std::vector<float> angle;
   std::vector<float> old_angle;
   std::vector<physics_type::Vector2> forces;
+  std::vector<float> torques;
   std::vector<float> masses;
+  std::vector<float> moment_of_inertia;
   std::vector<float> restitutions;
   std::vector<physics_type::Vector2> aabb_min;
   std::vector<physics_type::Vector2> aabb_max;
   ParticleStore ps;
   RectangleStore rs;
 
-  EntityStore(){
-      positions.reserve(1000);
-      old_positions.reserve(1000);
-        forces.reserve(1000);
-        masses.reserve(1000);
-        restitutions.reserve(1000);
-        aabb_min.reserve(1000);
-        aabb_max.reserve(1000);
-        ps.entity_index.reserve(1000);
-        ps.radius.reserve(1000);
-
-      // Log the initial state of the positions vector
-      std::cout << "Initial size of positions: " << positions.size() << std::endl;
-  }
+  EntityStore() = default;
 
   void moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector);
   void setParticleEntityPosition(uint32_t index, const physics_type::Vector2& position);
   void applyForce(uint32_t index, const physics_type::Vector2& force_vector);
-  void updateAABB(uint32_t index);
-  void varletStep(float dt);
+  void updateParticleAABB(uint32_t index);
+  void varletStep(float dt, float dampening_coef);
   void addParticleEntity(float radius, float mass, const physics_type::Vector2& position, float restitution = 0.0f);
   void addRectangleEntity(float width, float height, float mass, const physics_type::Vector2& positions, float restitution = 0.0f);
   void removeEntity(uint32_t idx);
   void clearForces();
+
+  // Entity Interfaces
+  std::unique_ptr<physics_entity::Entity> getEntity(uint32_t idx);
+  size_t getParticleStoreIdx(uint32_t idx);
+  size_t getRectangleStoreIdx(uint32_t idx);
 
 
   private: 
@@ -67,4 +64,8 @@ struct EntityStore{
                    const physics_type::Vector2& aabb_max, float angle);
   void removeParticleEntity(uint32_t idx);
   void removeRectangleEntity(uint32_t idx);
+
+  // Entity Interfaces
+  std::unique_ptr<physics_entity::Particle> getParticle(uint32_t idx);
+  std::unique_ptr<physics_entity::Rectangle> getRectangle(uint32_t idx);
 };

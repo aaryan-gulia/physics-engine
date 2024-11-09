@@ -5,6 +5,8 @@
 #include <iostream>
 #include <memory>
 
+const float DAMPENING_COEF = 0.01f;
+
 void PhysicsWorld::update(float _frame_time=0.0f){
   accumulateForces();
   varlet();
@@ -16,8 +18,11 @@ void PhysicsWorld::update(float _frame_time=0.0f){
 void PhysicsWorld::varlet(){
   auto curr_time = std::chrono::high_resolution_clock::now();
   std::chrono::duration<float> dt = curr_time - last_varlet_time;
+
+  // TODO: Remember use switch to using frame time as dt
+  
   for(uint32_t i = 0; i <= uint32_t(dt.count() / 0.02f); i++){
-    es.varletStep(0.01f);
+    es.varletStep(0.01f, DAMPENING_COEF);
   }
   last_varlet_time = curr_time;
   es.clearForces();
@@ -44,7 +49,7 @@ uint32_t PhysicsWorld::addParticleEntity(float radius, float mass, float x_posit
 }
 
 void PhysicsWorld::removeEntity(uint32_t index){
-  es.removeParticleEntity(index);
+  es.removeEntity(index);
 }
 
 void PhysicsWorld::addForceToEntity(uint32_t index, float x_force, float y_force){
