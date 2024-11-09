@@ -46,7 +46,6 @@ struct EntityStore{
   void moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector);
   void setParticleEntityPosition(uint32_t index, const physics_type::Vector2& position);
   void applyForce(uint32_t index, const physics_type::Vector2& force_vector);
-  void updateParticleAABB(uint32_t index);
   void varletStep(float dt, float dampening_coef);
   void addParticleEntity(float radius, float mass, const physics_type::Vector2& position, float restitution = 0.0f);
   void addRectangleEntity(float width, float height, float mass, const physics_type::Vector2& positions, float restitution = 0.0f);
@@ -60,10 +59,12 @@ struct EntityStore{
 
 
   private: 
-    void addEntity(float mass, float restitution, float position, const physics_type::Vector2& aabb_min, 
-                   const physics_type::Vector2& aabb_max, float angle);
+  void addEntity(float mass, float restitution, float position, const physics_type::Vector2& aabb_min,
+                 const physics_type::Vector2& aabb_max, float angle);
   void removeParticleEntity(uint32_t idx);
   void removeRectangleEntity(uint32_t idx);
+  void updateParticleAABB(uint32_t index);
+  void updateRectangleAABB(uint32_t index);
 
   // Entity Interfaces
   std::unique_ptr<physics_entity::Particle> getParticle(uint32_t idx);

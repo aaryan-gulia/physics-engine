@@ -1,5 +1,6 @@
 #include "EntityStore.h"
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include "Entity.h"
@@ -13,7 +14,6 @@ using namespace physics_entity;
 
 void EntityStore::moveEntity_NonVarlet(uint32_t index, const physics_type::Vector2& move_vector){
   positions[index] += move_vector;
-  updateParticleAABB(index);
 }
 void EntityStore::setParticleEntityPosition(uint32_t index,const physics_type::Vector2& position){
   positions[index] = position;
@@ -111,31 +111,47 @@ void EntityStore::clearForces(){
 }
 
 void EntityStore::updateParticleAABB(uint32_t index){
-  aabb_max[index].x = positions[index].x + ps.radius[index];
-  aabb_max[index].y = positions[index].y + ps.radius[index];
-  aabb_min[index].x = positions[index].x - ps.radius[index];
-  aabb_min[index].y = positions[index].y - ps.radius[index];
+  auto particle_idx = getParticleStoreIdx(index);
+  aabb_max[index].x = positions[index].x + ps.radius[particle_idx];
+  aabb_max[index].y = positions[index].y + ps.radius[particle_idx];
+  aabb_min[index].x = positions[index].x - ps.radius[particle_idx];
+  aabb_min[index].y = positions[index].y - ps.radius[particle_idx];
+}
+
+void EntityStore::updateRectangleAABB(uint32_t index){
+  auto rect_idx = getRectangleStoreIdx(index);
+  float a = angle[index];
+  float aabb_height = rs.height[rect_idx] * std::cos(a) + rs.width[rect_idx] * std::sin(a);
+  float aabb_width = rs.height[rect_idx] * std::sin(a) + rs.width[rect_idx] * std::cos(a);
+  
+  aabb_max[index].x = positions[index].x + aabb_width / 2.0f;
+  aabb_max[index].y = positions[index].y + aabb_height / 2.0f;
+  aabb_min[index].x = positions[index].x - aabb_width / 2.0f;
+  aabb_min[index].y = positions[index].y - aabb_height / 2.0f;
 }
 
 void EntityStore::varletStep(float dt, float dampening_coef){
   for(uint32_t i = 0; i< positions.size(); i++){
     // TODO: NEED TO IMPLEMENT TIME INVARIANT VERSION OF VERLET INTEGRATOR
-    dampening_coef *= 10;
     // position verlet 
     auto temp = positions[i];
     positions[i] = positions[i] * (2.0f - dampening_coef) - old_positions[i] * (1.0f - dampening_coef) 
                    + forces[i] / masses[i] * dt * dt;
     old_positions[i] = temp;
-    auto move = positions[i] - old_positions[i];
-
-    // TODO: DEVELOP UPDATE AABB METHODS FOR RECTANGLES
-    aabb_max[i] += move;
-    aabb_min[i] += move;
 
     // angle verlet
     auto temp_angle = angle[i];
     angle[i] = angle[i] * (2.0f - dampening_coef) - old_angle[i] * (1.0f - dampening_coef) 
                + torques[i] / moment_of_inertia[i] * dt * dt;
+  }
+
+  for(uint32_t i = 0; i < positions.size(); i++){
+    if(entity_types[i] == PARTICLE){
+      updateParticleAABB(i);
+    }
+    else if(entity_types[i] == RECTANGLE){
+      updateRectangleAABB(i);
+    }
   }
 }
 
