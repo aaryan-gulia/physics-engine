@@ -47,4 +47,7 @@ float Vector2::dot(const Vector2 vec) const{
   return (x * vec.x + y * vec.y);
 }
 
+Vector2 Vector2::triple_product(const Vector2& vec2, const Vector2& vec3) const{
+  return {y * (vec2.x * vec3.y - vec3.x * vec2.y), x * (vec2.y * vec3.x - vec3.y * vec2.x)};
+}
 

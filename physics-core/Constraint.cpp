@@ -1,6 +1,9 @@
 #include"Constraint.h"
 #include <cmath>
 #include <cstdint>
+#include <iostream>
+
+bool GJK_intersection_test(uint32_t id1, uint32_t id2, EntityStore& es);
 
 void GlobalCollisionConstraint::apply(){
   m_collision_grid.updatedGrid(m_es.aabb_min, m_es.aabb_max);
@@ -61,6 +64,7 @@ void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uin
     float dist_squared = m_es.positions[id1].distance_squared(m_es.positions[id2]);
     float min_distance =  m_es.ps.radius[particle1_idx] + m_es.ps.radius[particle2_idx];
     if(dist_squared < min_distance * min_distance) {
+    // if(GJK_intersection_test(id1, id2, m_es)){
       float dist = std::sqrt(dist_squared);
       float collision_restitution = (m_es.restitutions[id1] + m_es.restitutions[id2])/2.0f;
       float mass_ratio_1 = m_es.masses[id1]/(m_es.masses[id1]+m_es.masses[id2]);
@@ -71,8 +75,15 @@ void GlobalCollisionConstraint::applyGlobalCollisionResolution(uint32_t id1, uin
 
       m_es.moveEntity_NonVarlet(id1, move * (-1.0f * mass_ratio_2));
       m_es.moveEntity_NonVarlet(id2, move * mass_ratio_1);
+    }
   }
-
-      }
+  else {
+    if(GJK_intersection_test(id1, id2, m_es)){
+      // std::cout<<std::endl;
+      // std::cout<<"GJK INTERSECTION FOUND FOR "<< id1 <<" and "<<id2 <<std::endl;
+      m_es.positions[id1] = m_es.old_positions[id1];
+      m_es.positions[id2] = m_es.old_positions[id2];
+    }
+  }
 }
 

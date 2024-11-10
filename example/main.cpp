@@ -64,6 +64,9 @@ int main(){
     if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){
       addParticle(GetMousePosition().x,GetMousePosition().y ,1, world);
     }
+    if(IsKeyPressed(KEY_B)){
+      world.getEs().addRectangleEntity(40.0f, 40.0f, 1.0f, {GetMousePosition().x,GetMousePosition().y});
+    }
     if(IsKeyDown(KEY_R)){
       if(world.getEs().positions.size() > 1){
         world.removeEntity(world.getEs().positions.size() - 1);

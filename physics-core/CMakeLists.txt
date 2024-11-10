@@ -11,5 +11,6 @@ add_library(${PROJECT_NAME}
   Constraint.cpp 
   Entity.cpp 
   BroadPhaseGrid.cpp 
-  EntityStore.cpp)
+  EntityStore.cpp
+  CollisionSolver.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC . utils)
