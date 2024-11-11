@@ -25,6 +25,7 @@ class Vector2{
     float length() const;
     Vector2 unit() const;
     float dot(const Vector2& vec) const;
+    Vector2 normal() const;
     Vector2 triple_product(const Vector2& vec2, const Vector2& vec3) const;
 };
 
