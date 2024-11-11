@@ -14,17 +14,19 @@ using namespace physics_type;
 std::array<Vector2, 4> getRectangleVertices(const Vector2& position, float width, float height, float angle) {
     float cosTheta = std::cos(angle);
     float sinTheta = std::sin(angle);
-    
-    return {
-        Vector2{position.x + (width / 2.0f) * cosTheta - (height / 2.0f) * sinTheta,
-                position.y + (width / 2.0f) * sinTheta + (height / 2.0f) * cosTheta},
-        Vector2{position.x + (width / 2.0f) * cosTheta + (height / 2.0f) * sinTheta,
-                position.y - (width / 2.0f) * sinTheta + (height / 2.0f) * cosTheta},
-        Vector2{position.x - (width / 2.0f) * cosTheta + (height / 2.0f) * sinTheta,
-                position.y - (width / 2.0f) * sinTheta - (height / 2.0f) * cosTheta},
-        Vector2{position.x - (width / 2.0f) * cosTheta - (height / 2.0f) * sinTheta,
-                position.y + (width / 2.0f) * sinTheta - (height / 2.0f) * cosTheta}
+
+    std::array<Vector2, 4> vertices = {
+            Vector2{position.x + (width / 2.0f) * cosTheta - (height / 2.0f) * sinTheta,
+                    position.y + (width / 2.0f) * sinTheta + (height / 2.0f) * cosTheta},
+            Vector2{position.x + (width / 2.0f) * cosTheta + (height / 2.0f) * sinTheta,
+                    position.y - (width / 2.0f) * sinTheta - (height / 2.0f) * cosTheta},
+            Vector2{position.x - (width / 2.0f) * cosTheta + (height / 2.0f) * sinTheta,
+                    position.y - (width / 2.0f) * sinTheta - (height / 2.0f) * cosTheta},
+            Vector2{position.x - (width / 2.0f) * cosTheta - (height / 2.0f) * sinTheta,
+                    position.y + (width / 2.0f) * sinTheta + (height / 2.0f) * cosTheta}
     };
+
+    return vertices;
 }
 
 // std::array<Vector2,4> getRectangleVertices(const Vector2& position, float width, float height, float angle){
@@ -47,15 +49,17 @@ Vector2 getFarthestPointOnRectangle(const Vector2& position, float width, float 
   auto vertices = getRectangleVertices(position,width,height,angle);
   size_t farthest_virtex = 0;
   size_t curr = 0;
-  float max_proj = 0;
+  float max_proj = vertices[0].dot(direction);
   
   for(const auto& virtex: vertices){
     float proj = virtex.dot(direction);
     if(proj > max_proj){
       farthest_virtex = curr;
       max_proj = proj;
-    }     
+    }
+
     curr++;
+
   }
 
   return vertices[farthest_virtex];
@@ -113,16 +117,19 @@ bool containsOrigin(std::vector<Vector2>& simplex, Vector2& direction){
 }
 
 bool addToSimplex(std::vector<Vector2>& simplex, Vector2& direction, uint32_t id1, uint32_t id2, EntityStore& es){
-  simplex.emplace_back(getFarthestPointOnEntity(id1, es, direction) - getFarthestPointOnEntity(id2, es, direction));
+  direction = direction.unit();
+  simplex.emplace_back(getFarthestPointOnEntity(id1, es, direction) - getFarthestPointOnEntity(id2, es, direction * -1));
   if(simplex.back().dot(direction) < 0){
+
     return false;
   }
   return true;
 }
 
 bool GJK_intersection_test(uint32_t id1, uint32_t id2, EntityStore& es){
-  Vector2 d = {1.0f, 0.0f};
+  Vector2 d = (es.positions[id1] - es.positions[id2]);
   std::vector<Vector2> simplex;
+
   if(!addToSimplex(simplex, d, id1, id2, es)){
     // return false;
   }
@@ -130,9 +137,11 @@ bool GJK_intersection_test(uint32_t id1, uint32_t id2, EntityStore& es){
 
   do{
     if(!addToSimplex(simplex, d, id1, id2, es)){
+
       return false;
     }
   }while(!containsOrigin(simplex, d));
-  
+
+
   return true;
 }

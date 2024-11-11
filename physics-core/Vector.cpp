@@ -43,7 +43,7 @@ Vector2 Vector2::unit() const{
   return (*this/this->length());
 }
 
-float Vector2::dot(const Vector2 vec) const{
+float Vector2::dot(const Vector2& vec) const{
   return (x * vec.x + y * vec.y);
 }
 
